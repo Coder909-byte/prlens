@@ -18,7 +18,10 @@ Target resume line: "caught X% of real bugs on a N-PR benchmark at $Y/review; Z 
 - DB: Postgres + pgvector, Prisma ORM
 - Code parsing: tree-sitter (start with TypeScript/JavaScript and Python only)
 - Embeddings: Voyage code embedding model
-- LLMs: Claude API — cheaper model for triage/filtering, stronger model for the actual review
+- LLMs: swappable via the Vercel AI SDK (`ai` + `@ai-sdk/google`, `@ai-sdk/groq`, `@ai-sdk/anthropic`).
+  Provider/model selected at runtime via `LLM_PROVIDER` / `LLM_MODEL`, default Google Gemini's
+  current Flash model. Structured findings come from `generateObject` against the shared Zod
+  findings schema — no provider-specific parsing.
 - Dashboard + landing page: Next.js (apps/web), UI designed in Claude Design
 - Tests: Vitest
 
@@ -87,7 +90,12 @@ GITHUB_APP_ID=
 GITHUB_PRIVATE_KEY_PATH=./private-key.pem   # local; in production use GITHUB_PRIVATE_KEY (PEM contents)
 GITHUB_WEBHOOK_SECRET=
 WEBHOOK_PROXY_URL=                          # smee.io channel URL (local only)
-ANTHROPIC_API_KEY=
+LLM_PROVIDER=google                         # google | groq | anthropic
+LLM_MODEL=                                  # unset = per-provider default (google -> gemini-flash-latest)
+LLM_MAX_RETRIES=5                           # retry + backoff for retryable errors, incl. HTTP 429
+GOOGLE_GENERATIVE_AI_API_KEY=               # required if LLM_PROVIDER=google
+GROQ_API_KEY=                               # required if LLM_PROVIDER=groq
+ANTHROPIC_API_KEY=                          # required if LLM_PROVIDER=anthropic
 VOYAGE_API_KEY=                             # needed from Milestone 3
 DATABASE_URL=                               # Neon pooled connection string
 DIRECT_URL=                                 # Neon direct connection string (Prisma migrations)

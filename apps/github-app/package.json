@@ -1,0 +1,26 @@
+{
+  "name": "@prlens/github-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@prlens/shared": "workspace:*",
+    "hono": "^4.6.0",
+    "@hono/node-server": "^1.13.0",
+    "@octokit/webhooks": "^13.4.0",
+    "bullmq": "^5.34.0",
+    "smee-client": "^2.0.4",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0",
+    "@types/node": "^22.10.0"
+  }
+}

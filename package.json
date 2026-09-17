@@ -1,0 +1,22 @@
+{
+  "name": "prlens",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.10.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "db:generate": "pnpm --filter @prlens/db exec prisma generate",
+    "db:migrate": "pnpm --filter @prlens/db exec prisma migrate dev",
+    "db:studio": "pnpm --filter @prlens/db exec prisma studio"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.0",
+    "typescript": "^5.7.0"
+  }
+}

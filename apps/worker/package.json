@@ -1,0 +1,25 @@
+{
+  "name": "@prlens/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@prlens/shared": "workspace:*",
+    "@prlens/reviewer": "workspace:*",
+    "@prlens/db": "workspace:*",
+    "bullmq": "^5.34.0",
+    "@octokit/app": "^16.1.0",
+    "octokit": "^5.0.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0",
+    "@types/node": "^22.10.0"
+  }
+}
