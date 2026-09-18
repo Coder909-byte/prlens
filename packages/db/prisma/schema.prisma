@@ -36,6 +36,9 @@ enum FindingCategory {
 // here are what the eval harness (M2) reads to compute cost-per-review.
 model Review {
   id             String       @id @default(cuid())
+  // BigInt: GitHub's numeric installation IDs are 64-bit, past Postgres's
+  // INT4 range. pullNumber below is different - it's the small, per-repo
+  // sequential PR number shown in the URL, not a GitHub-issued global ID.
   installationId BigInt
   owner          String
   repo           String
@@ -64,6 +67,17 @@ model Review {
   skippedFiles Json     @default("[]")
   errorMessage String?
   createdAt    DateTime @default(now())
+
+  // The GitHub review this row's Findings were posted as, if posting
+  // succeeded. Used to find and supersede a PR's previous PRLens review
+  // (and clean up its now-stale inline comments) when a new commit arrives,
+  // instead of stacking a fresh review on top of it every time.
+  //
+  // BigInt, not Int: GitHub's numeric IDs (review/comment/PR/installation
+  // IDs) are 64-bit and routinely exceed Postgres's INT4 range (2^31-1) -
+  // installationId below learned this the same way. Audit any new
+  // GitHub-issued ID column against this before assuming Int is enough.
+  githubReviewId BigInt?
 
   findings Finding[]
 

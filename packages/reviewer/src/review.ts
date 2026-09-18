@@ -23,6 +23,14 @@ export interface ReviewOutcome {
 const VALIDATION_RETRY_NOTE =
   "\n\n## Note\nYour previous response did not match the required JSON schema. Return only a valid findings object this time.";
 
+const MISSING_TEST_DISABLED_NOTE =
+  "\n\n## Note\nDo not report missing_test findings in this review - that category is disabled.";
+
+function filterFindings(findings: Finding[]): Finding[] {
+  if (config.REPORT_MISSING_TESTS) return findings;
+  return findings.filter((f) => f.category !== "missing_test");
+}
+
 type AttemptResult =
   | { status: "success"; findings: Finding[] }
   | { status: "validation-failed" }
@@ -119,7 +127,7 @@ export async function runDiffOnlyReview(files: IncludedFile[], skipped: SkippedF
     ...config.LLM_FALLBACK_PROVIDERS.filter((p) => p !== config.LLM_PROVIDER),
   ];
 
-  const system = loadPrompt("diff-only.v1.md");
+  const system = loadPrompt("diff-only.v2.md") + (config.REPORT_MISSING_TESTS ? "" : MISSING_TEST_DISABLED_NOTE);
   const baseDiffText = buildDiffText(files, skipped);
   const usage = { inputTokens: 0, outputTokens: 0 };
 
@@ -143,7 +151,8 @@ export async function runDiffOnlyReview(files: IncludedFile[], skipped: SkippedF
             "review served by fallback provider",
           );
         }
-        return { findings: result.findings, usage, primaryProvider, primaryModel: primaryModelId, provider, model: modelId, failed: false };
+        const findings = filterFindings(result.findings);
+        return { findings, usage, primaryProvider, primaryModel: primaryModelId, provider, model: modelId, failed: false };
       }
       if (result.status === "validation-failed") {
         return { findings: [], usage, primaryProvider, primaryModel: primaryModelId, provider, model: modelId, failed: true };

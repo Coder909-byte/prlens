@@ -56,4 +56,36 @@ describe("FindingsSchema", () => {
     });
     expect(result.success).toBe(false);
   });
+
+  it("wraps a bare array response into {findings: [...]} (seen from Groq)", () => {
+    const finding = {
+      file: "src/index.ts",
+      line: 42,
+      severity: "high",
+      category: "bug",
+      explanation: "Null check missing before dereference.",
+      suggested_fix: "",
+      confidence: 0.8,
+    };
+
+    const result = FindingsSchema.safeParse([finding]);
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data).toEqual({ findings: [finding] });
+    }
+  });
+
+  it("wraps a bare empty array response into {findings: []}", () => {
+    const result = FindingsSchema.safeParse([]);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data).toEqual({ findings: [] });
+    }
+  });
+
+  it("still rejects a bare array containing an invalid finding", () => {
+    const result = FindingsSchema.safeParse([{ file: "a.ts", line: 1, severity: "extreme", category: "bug", explanation: "x", suggested_fix: "", confidence: 0.5 }]);
+    expect(result.success).toBe(false);
+  });
 });

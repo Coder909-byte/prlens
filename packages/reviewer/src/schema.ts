@@ -19,8 +19,16 @@ export const FindingSchema = z.object({
 
 export type Finding = z.infer<typeof FindingSchema>;
 
-export const FindingsSchema = z.object({
-  findings: z.array(FindingSchema),
-});
+/**
+ * Some models (seen from Groq) return a bare `[...]` array instead of the
+ * requested `{findings: [...]}` object - this normalizes that shape before
+ * the rest of the schema validates, so it's accepted instead of failing.
+ */
+export const FindingsSchema = z.preprocess(
+  (value) => (Array.isArray(value) ? { findings: value } : value),
+  z.object({
+    findings: z.array(FindingSchema),
+  }),
+);
 
 export type Findings = z.infer<typeof FindingsSchema>;

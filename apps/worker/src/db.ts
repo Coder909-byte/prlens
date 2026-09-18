@@ -31,6 +31,7 @@ export interface RecordReviewInput {
   findings: Finding[];
   inlineComments: InlineComment[];
   errorMessage?: string;
+  githubReviewId: number | null;
 }
 
 function wasPostedInline(finding: Finding, inlineComments: InlineComment[]): boolean {
@@ -52,6 +53,11 @@ export async function recordReview(input: RecordReviewInput): Promise<void> {
     latencyMs: input.latencyMs,
     skippedFiles: input.skipped as unknown as Prisma.InputJsonValue,
     errorMessage: input.errorMessage,
+    // GitHub's numeric IDs are 64-bit; keep them as plain JS numbers
+    // everywhere else in the app (safely representable - well under
+    // Number.MAX_SAFE_INTEGER) and only convert at the Prisma boundary,
+    // where the column is BigInt because Postgres's INT4 isn't wide enough.
+    githubReviewId: input.githubReviewId === null ? null : BigInt(input.githubReviewId),
   };
 
   // The pre-enqueue DB check + pg-boss's singletonKey (see queue.ts) mean the

@@ -12,6 +12,16 @@ export type LlmProvider = (typeof LLM_PROVIDERS)[number];
 // the LLM_MODEL incident this was added for.
 const optionalString = () => z.preprocess((v) => (v === "" ? undefined : v), z.string().optional());
 
+// z.coerce.boolean() is a footgun for env vars: it uses JS's Boolean(), so
+// the *string* "false" coerces to true (any non-empty string does). This
+// parses the intended true/false/1/0/yes/no text instead.
+const booleanFlag = (defaultValue: boolean) =>
+  z.preprocess((v) => {
+    if (v === undefined || v === "") return defaultValue;
+    if (typeof v === "string") return ["true", "1", "yes"].includes(v.trim().toLowerCase());
+    return v;
+  }, z.boolean());
+
 const EnvSchema = z
   .object({
     GITHUB_APP_ID: z.string().min(1, "GITHUB_APP_ID is required"),
@@ -59,6 +69,9 @@ const EnvSchema = z
 
     PORT: z.coerce.number().int().positive().default(3000),
     MAX_DIFF_BYTES: z.coerce.number().int().positive().default(60_000),
+    // missing_test findings are noisy in diff-only mode (no repo-wide test
+    // visibility to confirm coverage actually exists) - off by default.
+    REPORT_MISSING_TESTS: booleanFlag(false),
   })
   .refine((env) => Boolean(env.GITHUB_PRIVATE_KEY_PATH || env.GITHUB_PRIVATE_KEY), {
     message: "One of GITHUB_PRIVATE_KEY_PATH or GITHUB_PRIVATE_KEY must be set",

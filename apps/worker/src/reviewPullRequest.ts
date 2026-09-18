@@ -12,6 +12,7 @@ import {
 } from "@prlens/reviewer";
 import { getInstallationOctokit } from "./github.js";
 import { recordReview } from "./db.js";
+import { supersedePreviousReview } from "./supersede.js";
 
 export async function processReviewJob(job: Job<ReviewJobData>): Promise<void> {
   const startedAt = Date.now();
@@ -51,8 +52,14 @@ export async function processReviewJob(job: Job<ReviewJobData>): Promise<void> {
 
   const { body, inlineComments } = formatReview(outcome.findings, diffLineMap, skipped, outcome.failed);
 
+  // Mark the PR's previous PRLens review (if any) as superseded and drop its
+  // now-stale inline comments, before posting this one - so reviews don't
+  // stack up one per commit.
+  await supersedePreviousReview(octokit, data);
+
+  let githubReviewId: number | null = null;
   try {
-    await octokit.rest.pulls.createReview({
+    const { data: review } = await octokit.rest.pulls.createReview({
       owner: data.owner,
       repo: data.repo,
       pull_number: data.pullNumber,
@@ -60,15 +67,17 @@ export async function processReviewJob(job: Job<ReviewJobData>): Promise<void> {
       body,
       comments: inlineComments.length > 0 ? inlineComments : undefined,
     });
+    githubReviewId = review.id;
   } catch (error) {
     log.error({ err: error }, "createReview with inline comments failed, retrying with body only");
-    await octokit.rest.pulls.createReview({
+    const { data: review } = await octokit.rest.pulls.createReview({
       owner: data.owner,
       repo: data.repo,
       pull_number: data.pullNumber,
       event: "COMMENT",
       body: `${body}\n\n_(inline comments could not be posted; see worker logs)_`,
     });
+    githubReviewId = review.id;
   }
 
   const latencyMs = Date.now() - startedAt;
@@ -90,6 +99,7 @@ export async function processReviewJob(job: Job<ReviewJobData>): Promise<void> {
       findings: outcome.findings,
       inlineComments,
       errorMessage: outcome.failed ? "LLM did not return a schema-valid findings object after retrying" : undefined,
+      githubReviewId,
     });
   } catch (error) {
     // DB write is best-effort: never fail a review that already posted

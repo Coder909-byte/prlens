@@ -1,3 +1,5 @@
+import "./bigint.js";
+
 export { config, LLM_PROVIDERS, type Env, type LlmProvider } from "./config.js";
 export { logger } from "./logger.js";
 export { computeCostUsd } from "./pricing.js";
