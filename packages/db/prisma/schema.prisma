@@ -32,7 +32,7 @@ enum FindingCategory {
   STYLE
 }
 
-// One row per posted review (one BullMQ job). Token/cost/latency numbers
+// One row per posted review (one pg-boss job). Token/cost/latency numbers
 // here are what the eval harness (M2) reads to compute cost-per-review.
 model Review {
   id             String       @id @default(cuid())
@@ -45,8 +45,14 @@ model Review {
   mode           ReviewMode   @default(DIFF_ONLY)
   status         ReviewStatus
 
-  // Which LLM produced this review - providers are swappable (see
-  // packages/reviewer), so we record what actually ran.
+  // The provider/model actually attempted first (LLM_PROVIDER/LLM_MODEL at
+  // the time of the review).
+  primaryLlmProvider String
+  primaryLlmModel    String
+
+  // The provider/model that actually produced this review - differs from
+  // primaryLlm* only when a fallback provider (LLM_FALLBACK_PROVIDERS) had
+  // to take over after the primary failed with a retryable error.
   llmProvider    String
   llmModel       String
 

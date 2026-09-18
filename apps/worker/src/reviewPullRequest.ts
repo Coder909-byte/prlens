@@ -36,7 +36,15 @@ export async function processReviewJob(job: Job<ReviewJobData>): Promise<void> {
     // Nothing reviewable - skip the LLM call entirely, but still resolve
     // provider/model so the DB record is consistent with a normal review.
     const { provider, modelId } = resolveLanguageModel(config.LLM_PROVIDER, config.LLM_MODEL);
-    outcome = { findings: [], usage: { inputTokens: 0, outputTokens: 0 }, provider, model: modelId, failed: false };
+    outcome = {
+      findings: [],
+      usage: { inputTokens: 0, outputTokens: 0 },
+      primaryProvider: provider,
+      primaryModel: modelId,
+      provider,
+      model: modelId,
+      failed: false,
+    };
   } else {
     outcome = await runDiffOnlyReview(included, skipped);
   }
@@ -70,6 +78,8 @@ export async function processReviewJob(job: Job<ReviewJobData>): Promise<void> {
     await recordReview({
       job: data,
       status: outcome.failed ? ReviewStatus.FAILED : ReviewStatus.SUCCEEDED,
+      primaryProvider: outcome.primaryProvider,
+      primaryModel: outcome.primaryModel,
       provider: outcome.provider,
       model: outcome.model,
       inputTokens: outcome.usage.inputTokens,
@@ -87,5 +97,16 @@ export async function processReviewJob(job: Job<ReviewJobData>): Promise<void> {
     log.error({ err: error }, "failed to record review in DB");
   }
 
-  log.info({ latencyMs, findings: outcome.findings.length, failed: outcome.failed }, "review job completed");
+  log.info(
+    {
+      latencyMs,
+      findings: outcome.findings.length,
+      failed: outcome.failed,
+      primaryProvider: outcome.primaryProvider,
+      primaryModel: outcome.primaryModel,
+      provider: outcome.provider,
+      model: outcome.model,
+    },
+    "review job completed",
+  );
 }

@@ -23,7 +23,9 @@ Target resume line: "caught X% of real bugs on a N-PR benchmark at $Y/review; Z 
 - LLMs: swappable via the Vercel AI SDK (`ai` + `@ai-sdk/google`, `@ai-sdk/groq`, `@ai-sdk/anthropic`).
   Provider/model selected at runtime via `LLM_PROVIDER` / `LLM_MODEL`, default Google Gemini's
   current Flash model. Structured findings come from `generateObject` against the shared Zod
-  findings schema — no provider-specific parsing.
+  findings schema — no provider-specific parsing. `LLM_FALLBACK_PROVIDERS` lists providers to
+  try in order if the primary exhausts its retries on a 429/503/timeout; both the provider that
+  actually served a review and the one originally attempted are recorded on the `Review` row.
 - Dashboard + landing page: Next.js (apps/web), UI designed in Claude Design
 - Tests: Vitest
 
@@ -94,11 +96,13 @@ GITHUB_PRIVATE_KEY_PATH=./private-key.pem   # local; in production use GITHUB_PR
 GITHUB_WEBHOOK_SECRET=
 WEBHOOK_PROXY_URL=                          # smee.io channel URL (local only)
 LLM_PROVIDER=google                         # google | groq | anthropic
-LLM_MODEL=                                  # unset = per-provider default (google -> gemini-flash-latest)
-LLM_MAX_RETRIES=5                           # retry + backoff for retryable errors, incl. HTTP 429
-GOOGLE_GENERATIVE_AI_API_KEY=               # required if LLM_PROVIDER=google
-GROQ_API_KEY=                               # required if LLM_PROVIDER=groq
-ANTHROPIC_API_KEY=                          # required if LLM_PROVIDER=anthropic
+LLM_MODEL=                                  # unset = per-provider default (google -> gemini-flash-latest, groq -> openai/gpt-oss-120b)
+LLM_MAX_RETRIES=1                           # retries PER PROVIDER before failing over (1 = 2 attempts) - keep small, see packages/reviewer/src/review.ts
+LLM_REVIEW_TIMEOUT_SECONDS=90               # hard cap on one review call across all attempts + fallback providers
+LLM_FALLBACK_PROVIDERS=                     # comma-separated, tried in order after LLM_PROVIDER exhausts retries
+GOOGLE_GENERATIVE_AI_API_KEY=               # required if LLM_PROVIDER=google or google is a fallback
+GROQ_API_KEY=                               # required if LLM_PROVIDER=groq or groq is a fallback
+ANTHROPIC_API_KEY=                          # required if LLM_PROVIDER=anthropic or anthropic is a fallback
 VOYAGE_API_KEY=                             # needed from Milestone 3
 DATABASE_URL=                               # Neon pooled connection string
 DIRECT_URL=                                 # Neon direct connection string (Prisma migrations + pg-boss)

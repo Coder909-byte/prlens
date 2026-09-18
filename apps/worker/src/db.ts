@@ -19,6 +19,8 @@ const CATEGORY_MAP: Record<Finding["category"], FindingCategory> = {
 export interface RecordReviewInput {
   job: ReviewJobData;
   status: ReviewStatus;
+  primaryProvider: string;
+  primaryModel: string;
   provider: string;
   model: string;
   inputTokens: number;
@@ -40,6 +42,8 @@ export async function recordReview(input: RecordReviewInput): Promise<void> {
 
   const scalarData = {
     status: input.status,
+    primaryLlmProvider: input.primaryProvider,
+    primaryLlmModel: input.primaryModel,
     llmProvider: input.provider,
     llmModel: input.model,
     inputTokens: input.inputTokens,

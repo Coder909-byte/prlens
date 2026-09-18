@@ -21,10 +21,33 @@ const EnvSchema = z
     WEBHOOK_PROXY_URL: optionalString(),
 
     // LLM provider selection (Vercel AI SDK). Only the API key for the
-    // selected provider needs to be set - see the .refine() below.
+    // primary provider and any listed fallback providers needs to be set -
+    // see the .refine() below.
     LLM_PROVIDER: z.enum(LLM_PROVIDERS).default("google"),
     LLM_MODEL: optionalString(),
-    LLM_MAX_RETRIES: z.coerce.number().int().nonnegative().default(5),
+    // Retries PER PROVIDER before giving up on it and falling over to the
+    // next one (or failing the job if none remain). Default 1 = 2 attempts
+    // total. Keep this small - a 503 (model overloaded) or 429 (rate/quota
+    // exhausted) won't be fixed by burning the total time budget on one
+    // provider's backoff schedule; failing over quickly is the point.
+    LLM_MAX_RETRIES: z.coerce.number().int().nonnegative().default(1),
+    // Hard wall-clock cap, in seconds, on one review call across every
+    // attempt and every fallback provider combined. Once hit, the in-flight
+    // request is aborted and the job fails outright (no more providers are
+    // tried) - this bounds worst-case job latency regardless of how many
+    // fallback providers are configured or how slow their backoff is.
+    LLM_REVIEW_TIMEOUT_SECONDS: z.coerce.number().int().positive().default(90),
+    // Comma-separated, tried in order when the primary provider exhausts its
+    // own retries (LLM_MAX_RETRIES) with a retryable error (429/503/timeout).
+    // Each fallback uses its own default model - LLM_MODEL only applies to
+    // LLM_PROVIDER.
+    LLM_FALLBACK_PROVIDERS: z.preprocess((v) => {
+      if (v === undefined || v === "") return [];
+      return String(v)
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+    }, z.array(z.enum(LLM_PROVIDERS))),
     GOOGLE_GENERATIVE_AI_API_KEY: optionalString(),
     GROQ_API_KEY: optionalString(),
     ANTHROPIC_API_KEY: optionalString(),
@@ -42,17 +65,32 @@ const EnvSchema = z
     path: ["GITHUB_PRIVATE_KEY_PATH"],
   })
   .refine(
-    (env) => {
-      if (env.LLM_PROVIDER === "google") return Boolean(env.GOOGLE_GENERATIVE_AI_API_KEY);
-      if (env.LLM_PROVIDER === "groq") return Boolean(env.GROQ_API_KEY);
-      if (env.LLM_PROVIDER === "anthropic") return Boolean(env.ANTHROPIC_API_KEY);
-      return true;
-    },
+    (env) => missingApiKeyProviders(env).length === 0,
     (env) => ({
-      message: `LLM_PROVIDER is "${env.LLM_PROVIDER}" but its API key env var is not set`,
-      path: ["LLM_PROVIDER"],
+      message: `Missing API key env var for LLM provider(s): ${missingApiKeyProviders(env).join(", ")}`,
+      path: ["LLM_FALLBACK_PROVIDERS"],
     }),
   );
+
+function apiKeyFor(
+  env: { GOOGLE_GENERATIVE_AI_API_KEY?: string; GROQ_API_KEY?: string; ANTHROPIC_API_KEY?: string },
+  provider: LlmProvider,
+): string | undefined {
+  if (provider === "google") return env.GOOGLE_GENERATIVE_AI_API_KEY;
+  if (provider === "groq") return env.GROQ_API_KEY;
+  return env.ANTHROPIC_API_KEY;
+}
+
+function missingApiKeyProviders(env: {
+  LLM_PROVIDER: LlmProvider;
+  LLM_FALLBACK_PROVIDERS: LlmProvider[];
+  GOOGLE_GENERATIVE_AI_API_KEY?: string;
+  GROQ_API_KEY?: string;
+  ANTHROPIC_API_KEY?: string;
+}): LlmProvider[] {
+  const providers = [env.LLM_PROVIDER, ...env.LLM_FALLBACK_PROVIDERS];
+  return providers.filter((p) => !apiKeyFor(env, p));
+}
 
 export type Env = z.infer<typeof EnvSchema>;
 
