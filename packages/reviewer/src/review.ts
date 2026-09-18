@@ -56,7 +56,7 @@ export async function runDiffOnlyReview(files: IncludedFile[], skipped: SkippedF
         continue;
       }
       // Rate-limit exhaustion, auth failure, network error, etc: not
-      // recoverable by re-prompting - propagate so BullMQ retries the job.
+      // recoverable by re-prompting - propagate so pg-boss retries the job.
       throw error;
     }
   }

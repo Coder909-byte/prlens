@@ -14,7 +14,9 @@ Target resume line: "caught X% of real bugs on a N-PR benchmark at $Y/review; Z 
 - Language: TypeScript everywhere (Node 20+), pnpm workspaces + Turborepo
 - GitHub: GitHub App via Octokit (`@octokit/app`, `@octokit/webhooks`)
 - Webhook server: Hono (small, fast), deployed on Railway or Fly.io
-- Jobs: BullMQ + Redis (reviews run longer than a webhook request allows)
+- Jobs: pg-boss on the existing Neon Postgres (its own `pgboss` schema, connected via
+  `DIRECT_URL`) - reviews run longer than a webhook request allows, and this avoids
+  running a separate Redis instance
 - DB: Postgres + pgvector, Prisma ORM
 - Code parsing: tree-sitter (start with TypeScript/JavaScript and Python only)
 - Embeddings: Voyage code embedding model
@@ -80,7 +82,8 @@ Two modes must always exist, selectable by config: `diff-only` (baseline) and `r
 ## Local development environment
 - macOS 12 (Intel), VS Code, Node 24, pnpm 11
 - No Docker: never add docker-compose or container-based dev setup
-- Postgres is hosted on Neon (pgvector available); Redis is hosted on Redis Cloud
+- Postgres is hosted on Neon (pgvector available); pg-boss (jobs) runs in its own schema
+  on the same Neon database - no Redis, no Docker
 - Webhooks reach localhost through a smee.io channel
 - The developer commits and pushes manually: never run git commit or git push
 
@@ -98,6 +101,5 @@ GROQ_API_KEY=                               # required if LLM_PROVIDER=groq
 ANTHROPIC_API_KEY=                          # required if LLM_PROVIDER=anthropic
 VOYAGE_API_KEY=                             # needed from Milestone 3
 DATABASE_URL=                               # Neon pooled connection string
-DIRECT_URL=                                 # Neon direct connection string (Prisma migrations)
-REDIS_URL=                                  # Redis Cloud: redis://default:PASSWORD@HOST:PORT
+DIRECT_URL=                                 # Neon direct connection string (Prisma migrations + pg-boss)
 ```

@@ -1,4 +1,4 @@
-import type { Job } from "bullmq";
+import type { Job } from "pg-boss";
 import { config, logger, computeCostUsd, type ReviewJobData } from "@prlens/shared";
 import { ReviewStatus } from "@prlens/db";
 import {

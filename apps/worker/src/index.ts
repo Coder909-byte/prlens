@@ -1,5 +1,4 @@
-import { Worker } from "bullmq";
-import { createRedisConnection, logger, REVIEW_QUEUE_NAME, type ReviewJobData } from "@prlens/shared";
+import { createPgBoss, ensureReviewQueue, REVIEW_QUEUE_NAME, logger, type ReviewJobData } from "@prlens/shared";
 import { processReviewJob } from "./reviewPullRequest.js";
 
 // Hardcoded to 1: the default LLM provider (and any free-tier key on the
@@ -7,15 +6,36 @@ import { processReviewJob } from "./reviewPullRequest.js";
 // time rather than adding another config knob that just gets set to 1 anyway.
 const CONCURRENCY = 1;
 
-const worker = new Worker<ReviewJobData>(REVIEW_QUEUE_NAME, processReviewJob, {
-  connection: createRedisConnection(),
-  concurrency: CONCURRENCY,
-});
+async function main(): Promise<void> {
+  const boss = createPgBoss();
+  boss.on("error", (err) => logger.error({ err }, "pg-boss error"));
 
-worker.on("completed", (job) => {
-  logger.info({ jobId: job.id }, "review job completed");
-});
+  await boss.start();
+  await ensureReviewQueue(boss);
 
-worker.on("failed", (job, err) => {
-  logger.error({ jobId: job?.id, err }, "review job failed");
+  await boss.work<ReviewJobData>(
+    REVIEW_QUEUE_NAME,
+    { batchSize: CONCURRENCY, localConcurrency: CONCURRENCY },
+    async ([job]) => {
+      // batchSize is 1, so pg-boss only invokes this handler with exactly one
+      // job; the guard is here purely to satisfy noUncheckedIndexedAccess.
+      if (!job) return;
+      try {
+        await processReviewJob(job);
+      } catch (err) {
+        // pg-boss catches this to drive its own retry/failed-state bookkeeping
+        // and doesn't log it itself - without this, a failed review job is
+        // silent (no posted review, no DB row, nothing in the console).
+        logger.error({ err, jobId: job.id, data: job.data }, "review job failed");
+        throw err;
+      }
+    },
+  );
+
+  logger.info("worker listening for review jobs");
+}
+
+main().catch((err: unknown) => {
+  logger.error({ err }, "worker failed to start");
+  process.exit(1);
 });

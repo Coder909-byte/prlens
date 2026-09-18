@@ -50,9 +50,9 @@ export async function recordReview(input: RecordReviewInput): Promise<void> {
     errorMessage: input.errorMessage,
   };
 
-  // BullMQ's jobId + the unique (owner, repo, pullNumber, headSha) constraint
-  // mean the `update` branch below should only ever fire on a rare race -
-  // it deliberately doesn't recreate findings in that case.
+  // The pre-enqueue DB check + pg-boss's singletonKey (see queue.ts) mean the
+  // `update` branch below should only ever fire on a rare race - it
+  // deliberately doesn't recreate findings in that case.
   await prisma.review.upsert({
     where: {
       owner_repo_pullNumber_headSha: {

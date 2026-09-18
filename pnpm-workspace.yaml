@@ -7,3 +7,5 @@ allowBuilds:
   esbuild: true
   msgpackr-extract: true
   prisma: true
+minimumReleaseAgeExclude:
+  - pg-boss@12.33.1
