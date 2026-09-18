@@ -107,4 +107,5 @@ VOYAGE_API_KEY=                             # needed from Milestone 3
 DATABASE_URL=                               # Neon pooled connection string
 DIRECT_URL=                                 # Neon direct connection string (Prisma migrations + pg-boss)
 REPORT_MISSING_TESTS=false                  # missing_test findings are noisy in diff-only mode; opt in to enable
+GITHUB_MINER_TOKEN=                         # plain PAT (public-repo read), NOT the App - see evals/dataset/
 ```

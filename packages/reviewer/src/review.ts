@@ -7,10 +7,25 @@ import { buildDiffText } from "./diffText.js";
 import type { IncludedFile, SkippedFile } from "./diffFilter.js";
 import { isRetryableProviderError, summarizeProviderError } from "./providerErrors.js";
 
+/** Single source of truth for "which prompt file is current" - the eval runner
+ * loads the same file by this name to hash its content for cache keys. */
+export const DIFF_ONLY_PROMPT_VERSION = "diff-only.v2.md";
+
+export interface ReviewOptions {
+  /** Overrides LLM_PROVIDER. Used by the eval runner to pin a provider regardless of .env. */
+  provider?: LlmProvider;
+  /** Overrides LLM_MODEL. Only meaningful together with `provider`. */
+  model?: string;
+  /** Overrides LLM_FALLBACK_PROVIDERS. Pass [] to guarantee no fallback (eval runs must be single-provider). */
+  fallbackProviders?: LlmProvider[];
+  /** Overrides REPORT_MISSING_TESTS. */
+  reportMissingTests?: boolean;
+}
+
 export interface ReviewOutcome {
   findings: Finding[];
   usage: { inputTokens: number; outputTokens: number };
-  /** The provider/model actually attempted first (LLM_PROVIDER/LLM_MODEL). */
+  /** The provider/model actually attempted first. */
   primaryProvider: string;
   primaryModel: string;
   /** The provider/model that actually produced this outcome - may differ from primary after a fallback. */
@@ -26,8 +41,8 @@ const VALIDATION_RETRY_NOTE =
 const MISSING_TEST_DISABLED_NOTE =
   "\n\n## Note\nDo not report missing_test findings in this review - that category is disabled.";
 
-function filterFindings(findings: Finding[]): Finding[] {
-  if (config.REPORT_MISSING_TESTS) return findings;
+function filterFindings(findings: Finding[], reportMissingTests: boolean): Finding[] {
+  if (reportMissingTests) return findings;
   return findings.filter((f) => f.category !== "missing_test");
 }
 
@@ -106,28 +121,40 @@ async function attemptProvider(
 }
 
 /**
- * Tries LLM_PROVIDER first, then each of LLM_FALLBACK_PROVIDERS in order,
- * moving to the next only when the current one fails with a retryable
- * (429/503/timeout) error after exhausting its own retries. Every provider
- * except the primary uses its own default model - LLM_MODEL only applies to
- * LLM_PROVIDER.
+ * Tries the primary provider first, then each fallback in order, moving to
+ * the next only when the current one fails with a retryable (429/503/
+ * timeout) error after exhausting its own retries. Every provider except the
+ * primary uses its own default model - a model override only applies to the
+ * primary provider.
+ *
+ * Every field in `options` defaults to the matching LLM_* config value, so
+ * the worker's existing call site (no options) is unaffected. The eval
+ * runner passes explicit overrides - notably `fallbackProviders: []` - so a
+ * pinned eval run can never silently fail over regardless of what's in .env.
  *
  * The whole call - every attempt, every provider - is bounded by
  * LLM_REVIEW_TIMEOUT_SECONDS: once that's up, the in-flight request is
  * aborted and no further providers are tried, so one review job's worst-case
  * latency doesn't scale with how many fallback providers are configured.
  */
-export async function runDiffOnlyReview(files: IncludedFile[], skipped: SkippedFile[]): Promise<ReviewOutcome> {
-  const { provider: primaryProvider, modelId: primaryModelId } = resolveLanguageModel(
-    config.LLM_PROVIDER,
-    config.LLM_MODEL,
-  );
-  const providersToTry: LlmProvider[] = [
-    config.LLM_PROVIDER,
-    ...config.LLM_FALLBACK_PROVIDERS.filter((p) => p !== config.LLM_PROVIDER),
-  ];
+export async function runDiffOnlyReview(
+  files: IncludedFile[],
+  skipped: SkippedFile[],
+  options: ReviewOptions = {},
+): Promise<ReviewOutcome> {
+  const primary = options.provider ?? config.LLM_PROVIDER;
+  // config.LLM_MODEL was tuned for config.LLM_PROVIDER - only fall back to it
+  // when the provider itself wasn't overridden, so a caller pinning a
+  // different provider gets that provider's own default model, not a
+  // leftover model id that may not even exist there.
+  const primaryModelOverride = options.model ?? (options.provider ? undefined : config.LLM_MODEL);
+  const fallbackProviders = options.fallbackProviders ?? config.LLM_FALLBACK_PROVIDERS;
+  const reportMissingTests = options.reportMissingTests ?? config.REPORT_MISSING_TESTS;
 
-  const system = loadPrompt("diff-only.v2.md") + (config.REPORT_MISSING_TESTS ? "" : MISSING_TEST_DISABLED_NOTE);
+  const { provider: primaryProvider, modelId: primaryModelId } = resolveLanguageModel(primary, primaryModelOverride);
+  const providersToTry: LlmProvider[] = [primary, ...fallbackProviders.filter((p) => p !== primary)];
+
+  const system = loadPrompt(DIFF_ONLY_PROMPT_VERSION) + (reportMissingTests ? "" : MISSING_TEST_DISABLED_NOTE);
   const baseDiffText = buildDiffText(files, skipped);
   const usage = { inputTokens: 0, outputTokens: 0 };
 
@@ -139,7 +166,7 @@ export async function runDiffOnlyReview(files: IncludedFile[], skipped: SkippedF
     for (const provider of providersToTry) {
       if (controller.signal.aborted) break;
 
-      const modelOverride = provider === config.LLM_PROVIDER ? config.LLM_MODEL : undefined;
+      const modelOverride = provider === primary ? primaryModelOverride : undefined;
       const { model, modelId } = resolveLanguageModel(provider, modelOverride);
 
       const result = await attemptProvider(model, system, baseDiffText, usage, provider, modelId, controller.signal);
@@ -151,7 +178,7 @@ export async function runDiffOnlyReview(files: IncludedFile[], skipped: SkippedF
             "review served by fallback provider",
           );
         }
-        const findings = filterFindings(result.findings);
+        const findings = filterFindings(result.findings, reportMissingTests);
         return { findings, usage, primaryProvider, primaryModel: primaryModelId, provider, model: modelId, failed: false };
       }
       if (result.status === "validation-failed") {

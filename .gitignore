@@ -11,3 +11,13 @@ build/
 coverage/
 .vscode/*
 !.vscode/extensions.json
+
+# eval miner: local clones and resumable progress cursors are derived/regenerable -
+# the mined pairs (evals/dataset/repos/) and verdicts (evals/dataset/verdicts/) are not.
+evals/dataset/.repos/
+evals/dataset/state/
+# eval runner: cached LLM outcomes, keyed by prompt content hash - regenerable.
+evals/runner/.cache/
+# the test-split audit log is committed on purpose (enforces never-tune-on-test after
+# the fact) - un-ignore it despite the blanket *.log rule above.
+!evals/reports/test-runs.log
