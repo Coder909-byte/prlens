@@ -89,6 +89,23 @@ export interface LineHistoryEntry {
 
 const COMMIT_HEADER = /^commit ([0-9a-f]{40})/gm;
 
+/** Pure parser for `git log -L` output, split out from the subprocess call so it's unit-testable without a real git invocation. */
+export function parseLineHistoryOutput(output: string): LineHistoryEntry[] {
+  const matches = [...output.matchAll(COMMIT_HEADER)];
+  const entries: LineHistoryEntry[] = [];
+  for (let i = 0; i < matches.length; i++) {
+    const match = matches[i];
+    if (!match) continue;
+    const sha = match[1];
+    if (!sha) continue;
+    const start = match.index ?? 0;
+    const end = i + 1 < matches.length ? (matches[i + 1]?.index ?? output.length) : output.length;
+    const block = output.slice(start, end);
+    entries.push({ sha, looksLikeRename: /^rename (from|to) /m.test(block) });
+  }
+  return entries;
+}
+
 /**
  * `git log -L <startLine>,<endLine>:<path> <sinceRef>` - walks the line
  * range's history backward starting from `sinceRef` (pass the fix's base
@@ -110,20 +127,7 @@ export async function lineHistory(
     // renamed) - no history to walk.
     return [];
   }
-
-  const matches = [...output.matchAll(COMMIT_HEADER)];
-  const entries: LineHistoryEntry[] = [];
-  for (let i = 0; i < matches.length; i++) {
-    const match = matches[i];
-    if (!match) continue;
-    const sha = match[1];
-    if (!sha) continue;
-    const start = match.index ?? 0;
-    const end = i + 1 < matches.length ? (matches[i + 1]?.index ?? output.length) : output.length;
-    const block = output.slice(start, end);
-    entries.push({ sha, looksLikeRename: /^rename (from|to) /m.test(block) });
-  }
-  return entries;
+  return parseLineHistoryOutput(output);
 }
 
 /** The commit's own patch for one file, as `git show` unified diff text (used to extract the introducing commit's own hunk when it's the sole commit in its PR). */

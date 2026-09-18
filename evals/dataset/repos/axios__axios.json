@@ -1,0 +1,315 @@
+[
+  {
+    "id": "axios/axios#4699:revert:4550",
+    "repo": "axios/axios",
+    "buggyPr": {
+      "number": 4550,
+      "baseSha": "9f6ba5ee4326d33d2b84aef591582a26cc892d4d",
+      "headSha": "8d8a6200cfbe745b829c8179c226b63b336bf0a2"
+    },
+    "fixPr": {
+      "number": 4699
+    },
+    "groundTruth": [
+      {
+        "file": "lib/adapters/xhr.js",
+        "startLine": 31,
+        "endLine": 34
+      }
+    ],
+    "method": "revert",
+    "confidence": "high"
+  },
+  {
+    "id": "axios/axios#3289:revert:1773",
+    "repo": "axios/axios",
+    "buggyPr": {
+      "number": 1773,
+      "baseSha": "f2b478f7ffc4136334ceddf4e4cf9011c380f0bf",
+      "headSha": "cc177b2f640c8f13c401cb8bf6ee3f4d11a3668d"
+    },
+    "fixPr": {
+      "number": 3289
+    },
+    "groundTruth": [
+      {
+        "file": "lib/adapters/xhr.js",
+        "startLine": 21,
+        "endLine": 27
+      }
+    ],
+    "method": "revert",
+    "confidence": "high"
+  },
+  {
+    "id": "axios/axios#2982:revert:1511",
+    "repo": "axios/axios",
+    "buggyPr": {
+      "number": 1511,
+      "baseSha": "8a8c534a609cefb10824dec2f6a4b3ca1aa99171",
+      "headSha": "932db9e2be54faad010afbd6b7a41d0918c91498"
+    },
+    "fixPr": {
+      "number": 2982
+    },
+    "groundTruth": [
+      {
+        "file": "lib/defaults.js",
+        "startLine": 44,
+        "endLine": 44
+      },
+      {
+        "file": "test/specs/defaults.spec.js",
+        "startLine": 27,
+        "endLine": 32
+      }
+    ],
+    "method": "revert",
+    "confidence": "high"
+  },
+  {
+    "id": "axios/axios#2977:revert:1258",
+    "repo": "axios/axios",
+    "buggyPr": {
+      "number": 1258,
+      "baseSha": "1cdf9e4039ede6dd5e033112f3ff6bbaffb66970",
+      "headSha": "7e9dc2c567732bd3bffc18dbe6cedb4127e8b858"
+    },
+    "fixPr": {
+      "number": 2977
+    },
+    "groundTruth": [
+      {
+        "file": "lib/core/dispatchRequest.js",
+        "startLine": 46,
+        "endLine": 48
+      },
+      {
+        "file": "test/specs/headers.spec.js",
+        "startLine": 89,
+        "endLine": 101
+      }
+    ],
+    "method": "revert",
+    "confidence": "high"
+  },
+  {
+    "id": "axios/axios#1464:revert:1457",
+    "repo": "axios/axios",
+    "buggyPr": {
+      "number": 1457,
+      "baseSha": "cb89fae28f2372955ffdbb153034f612efc31b6c",
+      "headSha": "152b0635136801f1fdc0864d7b8dba3c12d86cb2"
+    },
+    "fixPr": {
+      "number": 1464
+    },
+    "groundTruth": [
+      {
+        "file": "package.json",
+        "startLine": 34,
+        "endLine": 75
+      }
+    ],
+    "method": "revert",
+    "confidence": "high"
+  },
+  {
+    "id": "axios/axios#5:package.json",
+    "repo": "axios/axios",
+    "buggyPr": {
+      "number": null,
+      "baseSha": "729404dff5454d74785e0c632bb6b4a855fa59ff^",
+      "headSha": "729404dff5454d74785e0c632bb6b4a855fa59ff"
+    },
+    "fixPr": {
+      "number": 5
+    },
+    "groundTruth": [
+      {
+        "file": "package.json",
+        "startLine": 46,
+        "endLine": 48
+      }
+    ],
+    "method": "issue-link",
+    "confidence": "needs-review",
+    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff"
+  },
+  {
+    "id": "axios/axios#205:test/specs/requests.spec.js",
+    "repo": "axios/axios",
+    "buggyPr": {
+      "number": 140,
+      "baseSha": "7fa69152e952b26c6655a3ee3775b0f90050e5d3",
+      "headSha": "837da5319cf0aa2724ec64400830d1b5ee009bca"
+    },
+    "fixPr": {
+      "number": 205
+    },
+    "groundTruth": [
+      {
+        "file": "test/specs/requests.spec.js",
+        "startLine": 62,
+        "endLine": 63
+      }
+    ],
+    "method": "issue-link",
+    "confidence": "medium",
+    "note": "multi-commit PR; ground truth re-mapped from the introducing commit to the PR's overall diff by matching line text"
+  },
+  {
+    "id": "axios/axios#274:.travis.yml",
+    "repo": "axios/axios",
+    "buggyPr": {
+      "number": null,
+      "baseSha": "b17e109eeaf8782a015ff65fea468e3c5662fd05^",
+      "headSha": "b17e109eeaf8782a015ff65fea468e3c5662fd05"
+    },
+    "fixPr": {
+      "number": 274
+    },
+    "groundTruth": [
+      {
+        "file": ".travis.yml",
+        "startLine": 5,
+        "endLine": 8
+      }
+    ],
+    "method": "issue-link",
+    "confidence": "needs-review",
+    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff"
+  },
+  {
+    "id": "axios/axios#274:karma.conf.js:0",
+    "repo": "axios/axios",
+    "buggyPr": {
+      "number": null,
+      "baseSha": "b17e109eeaf8782a015ff65fea468e3c5662fd05^",
+      "headSha": "b17e109eeaf8782a015ff65fea468e3c5662fd05"
+    },
+    "fixPr": {
+      "number": 274
+    },
+    "groundTruth": [
+      {
+        "file": "karma.conf.js",
+        "startLine": 19,
+        "endLine": 19
+      }
+    ],
+    "method": "issue-link",
+    "confidence": "needs-review",
+    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff"
+  },
+  {
+    "id": "axios/axios#274:karma.conf.js:1",
+    "repo": "axios/axios",
+    "buggyPr": {
+      "number": null,
+      "baseSha": "425d93502bd79c9afd67f4ed18fd865cf0b306da^",
+      "headSha": "425d93502bd79c9afd67f4ed18fd865cf0b306da"
+    },
+    "fixPr": {
+      "number": 274
+    },
+    "groundTruth": [
+      {
+        "file": "karma.conf.js",
+        "startLine": 99,
+        "endLine": 107
+      }
+    ],
+    "method": "issue-link",
+    "confidence": "needs-review",
+    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff"
+  },
+  {
+    "id": "axios/axios#274:karma.conf.js:2",
+    "repo": "axios/axios",
+    "buggyPr": {
+      "number": null,
+      "baseSha": "ce03103da4fb30642a5162a69daf08ef7b69a060^",
+      "headSha": "ce03103da4fb30642a5162a69daf08ef7b69a060"
+    },
+    "fixPr": {
+      "number": 274
+    },
+    "groundTruth": [
+      {
+        "file": "karma.conf.js",
+        "startLine": 208,
+        "endLine": 208
+      }
+    ],
+    "method": "issue-link",
+    "confidence": "needs-review",
+    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff"
+  },
+  {
+    "id": "axios/axios#299:test/specs/requests.spec.js:0",
+    "repo": "axios/axios",
+    "buggyPr": {
+      "number": 140,
+      "baseSha": "7fa69152e952b26c6655a3ee3775b0f90050e5d3",
+      "headSha": "837da5319cf0aa2724ec64400830d1b5ee009bca"
+    },
+    "fixPr": {
+      "number": 299
+    },
+    "groundTruth": [
+      {
+        "file": "test/specs/requests.spec.js",
+        "startLine": 57,
+        "endLine": 90
+      }
+    ],
+    "method": "issue-link",
+    "confidence": "needs-review",
+    "note": "multi-commit PR; could not uniquely re-map the introducing commit's lines to the PR's overall diff by text"
+  },
+  {
+    "id": "axios/axios#299:test/specs/requests.spec.js:3",
+    "repo": "axios/axios",
+    "buggyPr": {
+      "number": null,
+      "baseSha": "dcbb35226245483930a1f2969927a3b348bb2558^",
+      "headSha": "dcbb35226245483930a1f2969927a3b348bb2558"
+    },
+    "fixPr": {
+      "number": 299
+    },
+    "groundTruth": [
+      {
+        "file": "test/specs/requests.spec.js",
+        "startLine": 203,
+        "endLine": 203
+      }
+    ],
+    "method": "issue-link",
+    "confidence": "needs-review",
+    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff"
+  },
+  {
+    "id": "axios/axios#321:lib/axios.js",
+    "repo": "axios/axios",
+    "buggyPr": {
+      "number": 123,
+      "baseSha": "84027a31b4b4232ddcfce2bbb927a675f70c7fd1",
+      "headSha": "4ac0fbd1c1dc0c5f9ac290b635d6eee3783e355b"
+    },
+    "fixPr": {
+      "number": 321
+    },
+    "groundTruth": [
+      {
+        "file": "lib/axios.js",
+        "startLine": 72,
+        "endLine": 110
+      }
+    ],
+    "method": "issue-link",
+    "confidence": "needs-review",
+    "note": "multi-commit PR; could not uniquely re-map the introducing commit's lines to the PR's overall diff by text"
+  }
+]

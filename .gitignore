@@ -16,6 +16,8 @@ coverage/
 # the mined pairs (evals/dataset/repos/) and verdicts (evals/dataset/verdicts/) are not.
 evals/dataset/.repos/
 evals/dataset/state/
+# regenerable enrichment cache for the review Artifact - rebuild with `pnpm --filter @prlens/eval-dataset run review-data`
+evals/dataset/review-data.json
 # eval runner: cached LLM outcomes, keyed by prompt content hash - regenerable.
 evals/runner/.cache/
 # the test-split audit log is committed on purpose (enforces never-tune-on-test after

@@ -1,6 +1,6 @@
 import type { Octokit } from "octokit";
 import { lineHistory } from "./clone.js";
-import { parseHunkLines } from "./diffText.js";
+import { addedRange, parseHunks } from "./diffText.js";
 import { deriveGroundTruth, resolveOwningPr } from "./groundTruth.js";
 import type { MinedPair, PairConfidence } from "./types.js";
 
@@ -12,16 +12,22 @@ const REVERT_TRAILER = /This reverts commit ([0-9a-f]{40})/;
 const MAX_FILES = 3;
 const MAX_CHANGED_LINES = 50;
 
+// A "fix" to one of these isn't a code bug a diff-only reviewer would ever
+// be asked to catch - seen in practice: a got PR fixing a typo in
+// readme.md matched the fix-keyword heuristic and produced a ground-truth
+// candidate that made no sense as a benchmark case.
+export const NON_CODE_FILE = /(^|\/)(readme|changelog|license|authors|contributing)(\.\w+)?$|\.(md|mdx|rst|txt|adoc)$/i;
+
 async function withinSizeLimit(octokit: Octokit, owner: string, repo: string, prNumber: number): Promise<boolean> {
   const { data } = await octokit.rest.pulls.get({ owner, repo, pull_number: prNumber });
   return data.changed_files <= MAX_FILES && data.additions + data.deletions <= MAX_CHANGED_LINES;
 }
 
-function hunkRange(patch: string): { startLine: number; endLine: number } | null {
-  const lines = parseHunkLines(patch);
-  if (lines.length === 0) return null;
-  const lineNumbers = lines.map((l) => l.line);
-  return { startLine: Math.min(...lineNumbers), endLine: Math.max(...lineNumbers) };
+/** Per-hunk added-line ranges for one file's patch - a file with two unrelated hunks yields two separate ranges, never one span covering both. */
+function hunkRanges(patch: string): { startLine: number; endLine: number }[] {
+  return parseHunks(patch)
+    .map(addedRange)
+    .filter((r): r is { startLine: number; endLine: number } => r !== null);
 }
 
 /**
@@ -66,12 +72,8 @@ export async function findRevertPairs(
     });
 
     const groundTruth = revertedFiles
-      .filter((f) => f.patch)
-      .map((f) => {
-        const range = hunkRange(f.patch!);
-        return range ? { file: f.filename, ...range } : null;
-      })
-      .filter((r): r is { file: string; startLine: number; endLine: number } => r !== null);
+      .filter((f) => f.patch && !NON_CODE_FILE.test(f.filename))
+      .flatMap((f) => hunkRanges(f.patch!).map((range) => ({ file: f.filename, ...range })));
 
     if (groundTruth.length === 0) continue;
 
@@ -154,73 +156,76 @@ export async function findIssueLinkPairs(
       const { data: files } = await octokit.rest.pulls.listFiles({ owner, repo: name, pull_number: pr.number, per_page: 100 });
 
       for (const file of files) {
-        if (!file.patch) continue;
-        const range = hunkRange(file.patch);
-        if (!range) continue;
+        if (!file.patch || NON_CODE_FILE.test(file.filename)) continue;
+        const ranges = hunkRanges(file.patch);
 
-        const history = await lineHistory(repoDir, file.filename, range.startLine, range.endLine, pr.base.sha);
-        if (history.length === 0) continue;
-        const introducing = history[0]!;
+        for (const [hunkIndex, range] of ranges.entries()) {
+          const idSuffix = ranges.length > 1 ? `${file.filename}:${hunkIndex}` : file.filename;
 
-        let confidence: PairConfidence = "medium";
-        let note: string | undefined;
-        if (introducing.looksLikeRename) {
-          confidence = "needs-review";
-          note = "introducing commit's diff shows a rename for this file - git log -L doesn't follow renames, so the true origin may be further back";
-        }
+          const history = await lineHistory(repoDir, file.filename, range.startLine, range.endLine, pr.base.sha);
+          if (history.length === 0) continue;
+          const introducing = history[0]!;
 
-        const owning = await resolveOwningPr(octokit, owner, name, introducing.sha);
+          let confidence: PairConfidence = "medium";
+          let note: string | undefined;
+          if (introducing.looksLikeRename) {
+            confidence = "needs-review";
+            note = "introducing commit's diff shows a rename for this file - git log -L doesn't follow renames, so the true origin may be further back";
+          }
 
-        if (owning.status === "no-pr") {
+          const owning = await resolveOwningPr(octokit, owner, name, introducing.sha);
+
+          if (owning.status === "no-pr") {
+            pairsForThisPr.push({
+              id: `${owner}/${name}#${pr.number}:${idSuffix}`,
+              repo: `${owner}/${name}`,
+              buggyPr: { number: null, baseSha: `${introducing.sha}^`, headSha: introducing.sha },
+              fixPr: { number: pr.number },
+              groundTruth: [{ file: file.filename, ...range }],
+              method: "issue-link",
+              confidence: "needs-review",
+              note: note ?? "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff",
+            });
+            continue;
+          }
+          if (owning.status === "multiple-prs" || owning.prNumber === undefined) {
+            pairsForThisPr.push({
+              id: `${owner}/${name}#${pr.number}:${idSuffix}`,
+              repo: `${owner}/${name}`,
+              buggyPr: { number: null, baseSha: `${introducing.sha}^`, headSha: introducing.sha },
+              fixPr: { number: pr.number },
+              groundTruth: [{ file: file.filename, ...range }],
+              method: "issue-link",
+              confidence: "needs-review",
+              note: note ?? "introducing commit is associated with more than one PR (backport/cherry-pick?)",
+            });
+            continue;
+          }
+
+          const gt = await deriveGroundTruth(
+            octokit,
+            owner,
+            name,
+            repoDir,
+            introducing.sha,
+            owning.prNumber,
+            file.filename,
+            range.startLine,
+            range.endLine,
+          );
+          if (gt.ranges.length === 0) continue;
+
           pairsForThisPr.push({
-            id: `${owner}/${name}#${pr.number}:${file.filename}`,
+            id: `${owner}/${name}#${pr.number}:${idSuffix}`,
             repo: `${owner}/${name}`,
-            buggyPr: { number: null, baseSha: `${introducing.sha}^`, headSha: introducing.sha },
+            buggyPr: { number: owning.prNumber, baseSha: owning.baseSha!, headSha: owning.headSha! },
             fixPr: { number: pr.number },
-            groundTruth: [{ file: file.filename, ...range }],
+            groundTruth: gt.ranges,
             method: "issue-link",
-            confidence: "needs-review",
-            note: note ?? "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff",
+            confidence: confidence === "needs-review" ? "needs-review" : gt.confidence,
+            note: note ?? gt.note,
           });
-          continue;
         }
-        if (owning.status === "multiple-prs" || owning.prNumber === undefined) {
-          pairsForThisPr.push({
-            id: `${owner}/${name}#${pr.number}:${file.filename}`,
-            repo: `${owner}/${name}`,
-            buggyPr: { number: null, baseSha: `${introducing.sha}^`, headSha: introducing.sha },
-            fixPr: { number: pr.number },
-            groundTruth: [{ file: file.filename, ...range }],
-            method: "issue-link",
-            confidence: "needs-review",
-            note: note ?? "introducing commit is associated with more than one PR (backport/cherry-pick?)",
-          });
-          continue;
-        }
-
-        const gt = await deriveGroundTruth(
-          octokit,
-          owner,
-          name,
-          repoDir,
-          introducing.sha,
-          owning.prNumber,
-          file.filename,
-          range.startLine,
-          range.endLine,
-        );
-        if (gt.ranges.length === 0) continue;
-
-        pairsForThisPr.push({
-          id: `${owner}/${name}#${pr.number}:${file.filename}`,
-          repo: `${owner}/${name}`,
-          buggyPr: { number: owning.prNumber, baseSha: owning.baseSha!, headSha: owning.headSha! },
-          fixPr: { number: pr.number },
-          groundTruth: gt.ranges,
-          method: "issue-link",
-          confidence: confidence === "needs-review" ? "needs-review" : gt.confidence,
-          note: note ?? gt.note,
-        });
       }
 
       pairs.push(...pairsForThisPr);
