@@ -1,0 +1,17 @@
+[
+  {
+    "pairId": "python-poetry/poetry#235:poetry/console/commands/remove.py",
+    "verdict": "uncertain",
+    "decidedAt": "2026-09-19T19:09:50.751Z"
+  },
+  {
+    "pairId": "python-poetry/poetry#3943:revert:3927",
+    "verdict": "accept",
+    "decidedAt": "2026-09-19T19:05:38.493Z"
+  },
+  {
+    "pairId": "python-poetry/poetry#4748:revert:4362",
+    "verdict": "reject",
+    "decidedAt": "2026-09-19T19:06:10.230Z"
+  }
+]

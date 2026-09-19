@@ -1,0 +1,7 @@
+[
+  {
+    "pairId": "vitejs/vite#73:src/node/server/serverPluginModuleRewrite.ts",
+    "verdict": "uncertain",
+    "decidedAt": "2026-09-19T19:10:05.703Z"
+  }
+]

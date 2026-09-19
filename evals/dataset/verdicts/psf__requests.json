@@ -1,0 +1,37 @@
+[
+  {
+    "pairId": "psf/requests#37:requests/models.py",
+    "verdict": "reject",
+    "decidedAt": "2026-09-19T11:55:05.528Z"
+  },
+  {
+    "pairId": "psf/requests#3738:revert:3713",
+    "verdict": "accept",
+    "decidedAt": "2026-09-19T19:05:23.609Z"
+  },
+  {
+    "pairId": "psf/requests#77:requests/models.py:0",
+    "verdict": "reject",
+    "decidedAt": "2026-09-19T11:55:29.389Z"
+  },
+  {
+    "pairId": "psf/requests#77:requests/models.py:1",
+    "verdict": "reject",
+    "decidedAt": "2026-09-19T11:55:34.155Z"
+  },
+  {
+    "pairId": "psf/requests#87:requests/models.py:0",
+    "verdict": "reject",
+    "decidedAt": "2026-09-19T11:55:46.656Z"
+  },
+  {
+    "pairId": "psf/requests#87:requests/models.py:1",
+    "verdict": "reject",
+    "decidedAt": "2026-09-19T11:55:52.622Z"
+  },
+  {
+    "pairId": "psf/requests#87:requests/models.py:2",
+    "verdict": "reject",
+    "decidedAt": "2026-09-19T11:55:59.973Z"
+  }
+]

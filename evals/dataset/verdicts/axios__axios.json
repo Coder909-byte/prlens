@@ -1,0 +1,37 @@
+[
+  {
+    "pairId": "axios/axios#1464:revert:1457",
+    "verdict": "reject",
+    "decidedAt": "2026-09-19T10:06:15.015Z"
+  },
+  {
+    "pairId": "axios/axios#2977:revert:1258",
+    "verdict": "accept",
+    "decidedAt": "2026-09-19T19:05:08.990Z"
+  },
+  {
+    "pairId": "axios/axios#2982:revert:1511",
+    "verdict": "accept",
+    "decidedAt": "2026-09-19T19:04:46.128Z"
+  },
+  {
+    "pairId": "axios/axios#321:lib/axios.js",
+    "verdict": "reject",
+    "decidedAt": "2026-09-19T19:06:15.030Z"
+  },
+  {
+    "pairId": "axios/axios#3289:revert:1773",
+    "verdict": "accept",
+    "decidedAt": "2026-09-19T19:04:43.104Z"
+  },
+  {
+    "pairId": "axios/axios#4699:revert:4550",
+    "verdict": "accept",
+    "decidedAt": "2026-09-19T19:04:36.336Z"
+  },
+  {
+    "pairId": "axios/axios#5:package.json",
+    "verdict": "accept",
+    "decidedAt": "2026-09-19T10:03:04.376Z"
+  }
+]

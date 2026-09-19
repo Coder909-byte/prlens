@@ -1,0 +1,27 @@
+[
+  {
+    "pairId": "sveltejs/svelte#11568:revert:11562",
+    "verdict": "accept",
+    "decidedAt": "2026-09-19T19:05:55.229Z"
+  },
+  {
+    "pairId": "sveltejs/svelte#11644:revert:11640",
+    "verdict": "reject",
+    "decidedAt": "2026-09-19T19:06:55.234Z"
+  },
+  {
+    "pairId": "sveltejs/svelte#12931:revert:12921",
+    "verdict": "accept",
+    "decidedAt": "2026-09-19T19:05:46.810Z"
+  },
+  {
+    "pairId": "sveltejs/svelte#13131:revert:13082",
+    "verdict": "accept",
+    "decidedAt": "2026-09-19T19:05:43.678Z"
+  },
+  {
+    "pairId": "sveltejs/svelte#16063:revert:15972",
+    "verdict": "uncertain",
+    "decidedAt": "2026-09-19T19:09:34.483Z"
+  }
+]

@@ -23,6 +23,10 @@ const PRICING_TABLE: Record<string, ModelPrice> = {
   "claude-sonnet-5": { inputPerMTok: 2.0, outputPerMTok: 10.0 },
   "claude-haiku-4-5": { inputPerMTok: 1.0, outputPerMTok: 5.0 },
   "claude-opus-4-8": { inputPerMTok: 5.0, outputPerMTok: 25.0 },
+
+  // Groq (was missing entirely - the M3 eval harness's default provider is
+  // groq, so cost per review silently reported null until this was added)
+  "openai/gpt-oss-120b": { inputPerMTok: 0.15, outputPerMTok: 0.6 },
 };
 
 export function computeCostUsd(

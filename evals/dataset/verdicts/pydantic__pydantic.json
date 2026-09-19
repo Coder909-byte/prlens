@@ -1,0 +1,12 @@
+[
+  {
+    "pairId": "pydantic/pydantic#1662:revert:1378",
+    "verdict": "uncertain",
+    "decidedAt": "2026-09-19T19:09:21.782Z"
+  },
+  {
+    "pairId": "pydantic/pydantic#5541:revert:5501",
+    "verdict": "uncertain",
+    "decidedAt": "2026-09-19T19:09:04.280Z"
+  }
+]

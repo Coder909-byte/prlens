@@ -14,7 +14,8 @@
     "db:generate": "dotenv -e .env -- pnpm --filter @prlens/db exec prisma generate",
     "db:migrate": "dotenv -e .env -- pnpm --filter @prlens/db exec prisma migrate dev",
     "db:studio": "dotenv -e .env -- pnpm --filter @prlens/db exec prisma studio",
-    "mine": "dotenv -e .env -- pnpm --filter @prlens/eval-dataset run mine --"
+    "mine": "dotenv -e .env -- pnpm --filter @prlens/eval-dataset run mine --",
+    "eval": "dotenv -e .env -- pnpm --filter @prlens/eval-runner run eval --"
   },
   "devDependencies": {
     "turbo": "^2.3.0",

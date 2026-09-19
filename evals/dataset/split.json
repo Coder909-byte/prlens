@@ -1,0 +1,17 @@
+{
+  "note": "Dataset too small (11 accepted pairs) to hold out a test split - all accepted pairs are assigned to \"dev\" and used as the single evaluation set. No \"test\" split exists yet; --split test in the runner is reserved for when the dataset grows.",
+  "generatedAt": "2026-09-20T00:00:00.000Z",
+  "pairs": {
+    "axios/axios#4699:revert:4550": "dev",
+    "axios/axios#3289:revert:1773": "dev",
+    "axios/axios#2982:revert:1511": "dev",
+    "axios/axios#2977:revert:1258": "dev",
+    "date-fns/date-fns#1256:revert:1233": "dev",
+    "encode/httpx#2539:revert:2523": "dev",
+    "psf/requests#3738:revert:3713": "dev",
+    "python-poetry/poetry#3943:revert:3927": "dev",
+    "sveltejs/svelte#13131:revert:13082": "dev",
+    "sveltejs/svelte#12931:revert:12921": "dev",
+    "sveltejs/svelte#11568:revert:11562": "dev"
+  }
+}

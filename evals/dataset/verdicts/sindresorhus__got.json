@@ -1,0 +1,37 @@
+[
+  {
+    "pairId": "sindresorhus/got#10:index.js",
+    "verdict": "accept",
+    "decidedAt": "2026-09-19T11:56:56.329Z"
+  },
+  {
+    "pairId": "sindresorhus/got#10:test.js:0",
+    "verdict": "reject",
+    "decidedAt": "2026-09-19T11:56:48.242Z"
+  },
+  {
+    "pairId": "sindresorhus/got#10:test.js:1",
+    "verdict": "reject",
+    "decidedAt": "2026-09-19T11:56:43.827Z"
+  },
+  {
+    "pairId": "sindresorhus/got#172:index.js",
+    "verdict": "uncertain",
+    "decidedAt": "2026-09-18T17:29:21.851Z"
+  },
+  {
+    "pairId": "sindresorhus/got#230:index.js:0",
+    "verdict": "reject",
+    "decidedAt": "2026-09-19T11:56:15.409Z"
+  },
+  {
+    "pairId": "sindresorhus/got#230:index.js:1",
+    "verdict": "reject",
+    "decidedAt": "2026-09-19T11:56:12.489Z"
+  },
+  {
+    "pairId": "sindresorhus/got#236:index.js",
+    "verdict": "reject",
+    "decidedAt": "2026-09-19T11:56:09.655Z"
+  }
+]
