@@ -1,0 +1,336 @@
+[
+  {
+    "id": "psf/requests#6612:revert:6605",
+    "repo": "psf/requests",
+    "buggyPr": {
+      "number": 6605,
+      "baseSha": "3b5978fc5d1c121d70e83ddf59379cf36418b4ce",
+      "headSha": "1447bccc057e7fbffdfecd75cd4922702489a14b"
+    },
+    "fixPr": {
+      "number": 6612
+    },
+    "groundTruth": [
+      {
+        "file": "docs/_templates/sidebarintro.html",
+        "startLine": 19,
+        "endLine": 23
+      },
+      {
+        "file": "docs/_templates/sidebarlogo.html",
+        "startLine": 14,
+        "endLine": 22
+      }
+    ],
+    "method": "revert",
+    "confidence": "high",
+    "summary": {
+      "fixSummary": "docs: specify sphinx dirhtml builder, use references instead of absolutes"
+    }
+  },
+  {
+    "id": "psf/requests#3738:revert:3713",
+    "repo": "psf/requests",
+    "buggyPr": {
+      "number": 3713,
+      "baseSha": "268672ab3334a1f57f5c4e972585857b49ce1da4",
+      "headSha": "34af72c87d79bd8852e8564c050dd7711c6a08d6"
+    },
+    "fixPr": {
+      "number": 3738
+    },
+    "groundTruth": [
+      {
+        "file": "requests/models.py",
+        "startLine": 350,
+        "endLine": 352
+      },
+      {
+        "file": "tests/test_requests.py",
+        "startLine": 2141,
+        "endLine": 2157
+      }
+    ],
+    "method": "revert",
+    "confidence": "high",
+    "summary": {
+      "fixSummary": "Revert \"Restrict URL preparation to HTTP/HTTPS\"",
+      "issueSummary": "Requests v2.12.2 does not add parameters to URLs with schemes it does not understand."
+    }
+  },
+  {
+    "id": "psf/requests#2306:revert:2306",
+    "repo": "psf/requests",
+    "buggyPr": {
+      "number": 2306,
+      "baseSha": "6b58a359e8af882eb3fd89a54e0a4db38c9afa2e",
+      "headSha": "583859b8204a1e9dd8a337f1ca06e31e8f79b5f8"
+    },
+    "fixPr": {
+      "number": 2306
+    },
+    "groundTruth": [
+      {
+        "file": "test_requests.py",
+        "startLine": 1514,
+        "endLine": 1515
+      }
+    ],
+    "method": "revert",
+    "confidence": "high",
+    "summary": {
+      "fixSummary": "Fix failing test test_prepare_unicode_url"
+    }
+  },
+  {
+    "id": "psf/requests#399:revert:399",
+    "repo": "psf/requests",
+    "buggyPr": {
+      "number": 399,
+      "baseSha": "4516bd45b23dccf819e1d3d564415276ccbe7b07",
+      "headSha": "67f50a0fe53765987e5a6a1c02daabe6400322af"
+    },
+    "fixPr": {
+      "number": 399
+    },
+    "groundTruth": [
+      {
+        "file": "requests/async.py",
+        "startLine": 49,
+        "endLine": 57
+      },
+      {
+        "file": "requests/async.py",
+        "startLine": 82,
+        "endLine": 82
+      },
+      {
+        "file": "requests/models.py",
+        "startLine": 206,
+        "endLine": 213
+      },
+      {
+        "file": "requests/models.py",
+        "startLine": 252,
+        "endLine": 252
+      }
+    ],
+    "method": "revert",
+    "confidence": "high",
+    "summary": {
+      "fixSummary": "Fix for #239: “Too many open files” "
+    }
+  },
+  {
+    "id": "psf/requests#316:revert:316",
+    "repo": "psf/requests",
+    "buggyPr": {
+      "number": 316,
+      "baseSha": "f5e421e880761791bbec40556aa9abf15bf7f4f8",
+      "headSha": "a7223f86a976410bb904fb2e983440c94175aa75"
+    },
+    "fixPr": {
+      "number": 316
+    },
+    "groundTruth": [
+      {
+        "file": "requests/models.py",
+        "startLine": 441,
+        "endLine": 444
+      },
+      {
+        "file": "test_requests.py",
+        "startLine": 622,
+        "endLine": 632
+      }
+    ],
+    "method": "revert",
+    "confidence": "high",
+    "summary": {
+      "fixSummary": "Make safe_mode play nice with timeout (fixes #312)",
+      "issueSummary": "Unhandled exception on timeout in safe_mode"
+    }
+  },
+  {
+    "id": "psf/requests#37:requests/models.py",
+    "repo": "psf/requests",
+    "buggyPr": {
+      "number": null,
+      "baseSha": "e153b94190359f9d7dbdd0753d182bf672baab9d^",
+      "headSha": "e153b94190359f9d7dbdd0753d182bf672baab9d"
+    },
+    "fixPr": {
+      "number": 37
+    },
+    "groundTruth": [
+      {
+        "file": "requests/models.py",
+        "startLine": 180,
+        "endLine": 185
+      }
+    ],
+    "method": "issue-link",
+    "confidence": "needs-review",
+    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff",
+    "summary": {
+      "fixSummary": "Support relative redirects. Fixes #36",
+      "issueSummary": "Support Relative Redirects"
+    }
+  },
+  {
+    "id": "psf/requests#77:requests/models.py:0",
+    "repo": "psf/requests",
+    "buggyPr": {
+      "number": null,
+      "baseSha": "14ef4622634ae8746bce600523cbed15a119d15a^",
+      "headSha": "14ef4622634ae8746bce600523cbed15a119d15a"
+    },
+    "fixPr": {
+      "number": 77
+    },
+    "groundTruth": [
+      {
+        "file": "requests/models.py",
+        "startLine": 15,
+        "endLine": 15
+      }
+    ],
+    "method": "issue-link",
+    "confidence": "needs-review",
+    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff",
+    "summary": {
+      "fixSummary": "Implemented idna (fixes #76).",
+      "issueSummary": "Requests does not support Internationalized domain name (idna)"
+    }
+  },
+  {
+    "id": "psf/requests#77:requests/models.py:1",
+    "repo": "psf/requests",
+    "buggyPr": {
+      "number": null,
+      "baseSha": "80d860d2d409b6d2a6b4c133ef0eef4de6b32ef2^",
+      "headSha": "80d860d2d409b6d2a6b4c133ef0eef4de6b32ef2"
+    },
+    "fixPr": {
+      "number": 77
+    },
+    "groundTruth": [
+      {
+        "file": "requests/models.py",
+        "startLine": 241,
+        "endLine": 244
+      }
+    ],
+    "method": "issue-link",
+    "confidence": "needs-review",
+    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff",
+    "summary": {
+      "fixSummary": "Implemented idna (fixes #76).",
+      "issueSummary": "Requests does not support Internationalized domain name (idna)"
+    }
+  },
+  {
+    "id": "psf/requests#77:test_requests.py",
+    "repo": "psf/requests",
+    "buggyPr": {
+      "number": null,
+      "baseSha": "1421ffa32ab4709c9a7634493803bd55a3c6615f^",
+      "headSha": "1421ffa32ab4709c9a7634493803bd55a3c6615f"
+    },
+    "fixPr": {
+      "number": 77
+    },
+    "groundTruth": [
+      {
+        "file": "test_requests.py",
+        "startLine": 324,
+        "endLine": 326
+      }
+    ],
+    "method": "issue-link",
+    "confidence": "needs-review",
+    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff",
+    "summary": {
+      "fixSummary": "Implemented idna (fixes #76).",
+      "issueSummary": "Requests does not support Internationalized domain name (idna)"
+    }
+  },
+  {
+    "id": "psf/requests#87:requests/models.py:0",
+    "repo": "psf/requests",
+    "buggyPr": {
+      "number": null,
+      "baseSha": "cd8ce63a3b6850afb5ba3c3677f5715907468f7e^",
+      "headSha": "cd8ce63a3b6850afb5ba3c3677f5715907468f7e"
+    },
+    "fixPr": {
+      "number": 87
+    },
+    "groundTruth": [
+      {
+        "file": "requests/models.py",
+        "startLine": 154,
+        "endLine": 155
+      }
+    ],
+    "method": "issue-link",
+    "confidence": "needs-review",
+    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff",
+    "summary": {
+      "fixSummary": "Added the possibility to access headers without fetching the whole body (",
+      "issueSummary": "Be able to get the response content as a file like object"
+    }
+  },
+  {
+    "id": "psf/requests#87:requests/models.py:1",
+    "repo": "psf/requests",
+    "buggyPr": {
+      "number": null,
+      "baseSha": "14ef4622634ae8746bce600523cbed15a119d15a^",
+      "headSha": "14ef4622634ae8746bce600523cbed15a119d15a"
+    },
+    "fixPr": {
+      "number": 87
+    },
+    "groundTruth": [
+      {
+        "file": "requests/models.py",
+        "startLine": 332,
+        "endLine": 332
+      }
+    ],
+    "method": "issue-link",
+    "confidence": "needs-review",
+    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff",
+    "summary": {
+      "fixSummary": "Added the possibility to access headers without fetching the whole body (",
+      "issueSummary": "Be able to get the response content as a file like object"
+    }
+  },
+  {
+    "id": "psf/requests#87:requests/models.py:2",
+    "repo": "psf/requests",
+    "buggyPr": {
+      "number": null,
+      "baseSha": "39edf7a7fad2e799cc9129bcf3d2ba33df0cc507^",
+      "headSha": "39edf7a7fad2e799cc9129bcf3d2ba33df0cc507"
+    },
+    "fixPr": {
+      "number": 87
+    },
+    "groundTruth": [
+      {
+        "file": "requests/models.py",
+        "startLine": 362,
+        "endLine": 375
+      }
+    ],
+    "method": "issue-link",
+    "confidence": "needs-review",
+    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff",
+    "summary": {
+      "fixSummary": "Added the possibility to access headers without fetching the whole body (",
+      "issueSummary": "Be able to get the response content as a file like object"
+    }
+  }
+]

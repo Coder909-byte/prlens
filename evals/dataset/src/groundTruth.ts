@@ -4,20 +4,33 @@ import { addedRange, findUniqueLineByText, parseHunkLines, parseHunks } from "./
 import type { GroundTruthRange, PairConfidence } from "./types.js";
 
 export interface ResolvedIntroducingCommit {
-  status: "resolved" | "no-pr" | "multiple-prs";
+  status: "resolved" | "no-pr" | "multiple-prs" | "not-found";
   prNumber?: number;
   baseSha?: string;
   headSha?: string;
 }
 
-/** Which (merged) PR a commit belongs to, if any. */
+/**
+ * Which (merged) PR a commit belongs to, if any. GitHub answers 422/404
+ * "No commit found" for a SHA it can't resolve - seen in practice on
+ * psf/requests, where a revert trailer named a commit no longer reachable
+ * (history rewrite, or the SHA belonged to a fork/rebase) - that's a
+ * legitimate "can't identify this one" outcome, not a crash.
+ */
 export async function resolveOwningPr(
   octokit: Octokit,
   owner: string,
   repo: string,
   sha: string,
 ): Promise<ResolvedIntroducingCommit> {
-  const { data: prs } = await octokit.rest.repos.listPullRequestsAssociatedWithCommit({ owner, repo, commit_sha: sha });
+  let prs;
+  try {
+    ({ data: prs } = await octokit.rest.repos.listPullRequestsAssociatedWithCommit({ owner, repo, commit_sha: sha }));
+  } catch (err) {
+    const status = (err as { status?: number }).status;
+    if (status === 422 || status === 404) return { status: "not-found" };
+    throw err;
+  }
   const merged = prs.filter((pr) => pr.merged_at);
   if (merged.length === 0) return { status: "no-pr" };
   if (merged.length > 1) return { status: "multiple-prs" };

@@ -213,7 +213,7 @@ export async function findIssueLinkPairs(
             });
             continue;
           }
-          if (owning.status === "multiple-prs" || owning.prNumber === undefined) {
+          if (owning.status === "multiple-prs" || owning.status === "not-found" || owning.prNumber === undefined) {
             pairsForThisPr.push({
               id: `${owner}/${name}#${pr.number}:${idSuffix}`,
               repo: `${owner}/${name}`,
@@ -222,7 +222,11 @@ export async function findIssueLinkPairs(
               groundTruth: [{ file: file.filename, ...range }],
               method: "issue-link",
               confidence: "needs-review",
-              note: note ?? "introducing commit is associated with more than one PR (backport/cherry-pick?)",
+              note:
+                note ??
+                (owning.status === "not-found"
+                  ? "introducing commit's SHA could not be resolved by GitHub's API (dangling after a history rewrite?) - ground truth is that commit's own diff"
+                  : "introducing commit is associated with more than one PR (backport/cherry-pick?)"),
               summary,
             });
             continue;
