@@ -1,0 +1,55 @@
+[
+  {
+    "id": "date-fns/date-fns#1256:revert:1233",
+    "repo": "date-fns/date-fns",
+    "buggyPr": {
+      "number": 1233,
+      "baseSha": "04dbe61740e849989985d01d4cd7b83f493b60c5",
+      "headSha": "b44c7239595af1ed3d13d81c81461882d9e90648"
+    },
+    "fixPr": {
+      "number": 1256
+    },
+    "groundTruth": [
+      {
+        "file": "scripts/build/_lib/typings/typeScript.js",
+        "startLine": 376,
+        "endLine": 376
+      }
+    ],
+    "method": "revert",
+    "confidence": "high",
+    "summary": {
+      "fixSummary": "Revert \"fix(typings): export interface\""
+    }
+  },
+  {
+    "id": "date-fns/date-fns#35:src/is_after.js",
+    "repo": "date-fns/date-fns",
+    "buggyPr": {
+      "number": null,
+      "baseSha": "10bb2505c4aeadc3da8fc7e19aefab6cda0303fe^",
+      "headSha": "10bb2505c4aeadc3da8fc7e19aefab6cda0303fe"
+    },
+    "fixPr": {
+      "number": 35
+    },
+    "groundTruth": [
+      {
+        "file": "src/is_after.js",
+        "startLine": 8,
+        "endLine": 17
+      }
+    ],
+    "method": "issue-link",
+    "confidence": "needs-review",
+    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff",
+    "summary": {
+      "fixSummary": "Fixes #34",
+      "issueSummary": "isAfter is isBefore?"
+    },
+    "unusable": {
+      "reason": "introducing commit creates this file from scratch - not a meaningful single-bug introduction"
+    }
+  }
+]

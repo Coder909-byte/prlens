@@ -1,0 +1,26 @@
+[
+  {
+    "id": "encode/httpx#2539:revert:2523",
+    "repo": "encode/httpx",
+    "buggyPr": {
+      "number": 2523,
+      "baseSha": "10a3b68a71d6cb16b170dec4efe2ec1ae197d65f",
+      "headSha": "f52bfe8abce7604754b369738c6bf5dc5a4ccdeb"
+    },
+    "fixPr": {
+      "number": 2539
+    },
+    "groundTruth": [
+      {
+        "file": "httpx/_utils.py",
+        "startLine": 70,
+        "endLine": 74
+      }
+    ],
+    "method": "revert",
+    "confidence": "high",
+    "summary": {
+      "fixSummary": "Revert \"Raise `TypeError` on invalid query params. (#2523)\""
+    }
+  }
+]

@@ -1,0 +1,28 @@
+[
+  {
+    "id": "vitejs/vite#73:src/node/server/serverPluginModuleRewrite.ts",
+    "repo": "vitejs/vite",
+    "buggyPr": {
+      "number": null,
+      "baseSha": "ca421cdf9348076a53ad1ff1a9e6ee4095776eae^",
+      "headSha": "ca421cdf9348076a53ad1ff1a9e6ee4095776eae"
+    },
+    "fixPr": {
+      "number": 73
+    },
+    "groundTruth": [
+      {
+        "file": "src/node/server/serverPluginModuleRewrite.ts",
+        "startLine": 170,
+        "endLine": 170
+      }
+    ],
+    "method": "issue-link",
+    "confidence": "needs-review",
+    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff",
+    "summary": {
+      "fixSummary": "fix: fix resolve path on windows",
+      "issueSummary": "vite 0.11.3 does not work on windows"
+    }
+  }
+]

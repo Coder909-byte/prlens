@@ -17,4 +17,13 @@ export const CANDIDATE_REPOS: RepoRef[] = [
   { owner: "pallets", name: "flask" },
   { owner: "pallets", name: "click" },
   { owner: "tiangolo", name: "fastapi" },
+  // Added for modern PR workflow + active "bug"-label triage (the first
+  // batch skewed toward repos where small fixes cluster in tests/CI/docs,
+  // or where "fixes #N" closes a feature request rather than a bug).
+  { owner: "vitejs", name: "vite" },
+  { owner: "sveltejs", name: "svelte" },
+  { owner: "trpc", name: "trpc" },
+  { owner: "encode", name: "httpx" },
+  { owner: "pydantic", name: "pydantic" },
+  { owner: "python-poetry", name: "poetry" },
 ];

@@ -1,0 +1,76 @@
+[
+  {
+    "id": "python-poetry/poetry#4748:revert:4362",
+    "repo": "python-poetry/poetry",
+    "buggyPr": {
+      "number": 4362,
+      "baseSha": "6c8624638de9b7aadeb565b9eae5480a96a6d4c5",
+      "headSha": "c5a0ed4c6f81187fdaa0d8a7ac4435bb8c461e81"
+    },
+    "fixPr": {
+      "number": 4748
+    },
+    "groundTruth": [
+      {
+        "file": "pyproject.toml",
+        "startLine": 46,
+        "endLine": 50
+      }
+    ],
+    "method": "revert",
+    "confidence": "high",
+    "summary": {
+      "fixSummary": "Revert \"Update packaging requirement to support 21.0\""
+    }
+  },
+  {
+    "id": "python-poetry/poetry#3943:revert:3927",
+    "repo": "python-poetry/poetry",
+    "buggyPr": {
+      "number": 3927,
+      "baseSha": "affabe04c8cdfaa63d7d87b36107fd1003048688",
+      "headSha": "6185167e7ef6554df9666e23dd15ec956acc7a58"
+    },
+    "fixPr": {
+      "number": 3943
+    },
+    "groundTruth": [
+      {
+        "file": "get-poetry.py",
+        "startLine": 355,
+        "endLine": 355
+      }
+    ],
+    "method": "revert",
+    "confidence": "high",
+    "summary": {
+      "fixSummary": "Revert \"fix(get-poetry): use exit code 1 with non-existing version\""
+    }
+  },
+  {
+    "id": "python-poetry/poetry#235:poetry/console/commands/remove.py",
+    "repo": "python-poetry/poetry",
+    "buggyPr": {
+      "number": null,
+      "baseSha": "8e32aca50dd87b64c178c1f0c4dbfbe22a29888b^",
+      "headSha": "8e32aca50dd87b64c178c1f0c4dbfbe22a29888b"
+    },
+    "fixPr": {
+      "number": 235
+    },
+    "groundTruth": [
+      {
+        "file": "poetry/console/commands/remove.py",
+        "startLine": 42,
+        "endLine": 42
+      }
+    ],
+    "method": "issue-link",
+    "confidence": "needs-review",
+    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff",
+    "summary": {
+      "fixSummary": "Fix remove's case insensitivity",
+      "issueSummary": "\"poetry remove\" case-sensitivity (qol)"
+    }
+  }
+]

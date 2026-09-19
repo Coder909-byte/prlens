@@ -46,6 +46,14 @@ export interface MinedPair {
   /** Why this is needs-review, or any other note worth keeping - e.g. "multi-commit PR, matched by text" or "possible rename boundary". */
   note?: string;
   summary?: PairSummary;
+  /**
+   * Set when the introducing diff couldn't be recovered through the same
+   * path the scoring harness will use (the owning PR's `pulls.listFiles`,
+   * or - for a PR-less direct push - the commit's own diff): GitHub omits
+   * `patch` for very large or binary file diffs. Unusable for scoring, so
+   * excluded from the review docket rather than surfaced for a verdict.
+   */
+  unusable?: { reason: string };
 }
 
 export interface PilotStats {

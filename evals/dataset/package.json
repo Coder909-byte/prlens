@@ -7,6 +7,7 @@
   "scripts": {
     "mine": "tsx src/index.ts",
     "backfill-summaries": "tsx src/backfillSummaries.ts",
+    "apply-filters": "tsx src/applyGroundTruthFilters.ts",
     "review-data": "tsx src/buildReviewData.ts",
     "build": "tsc --noEmit",
     "test": "vitest run --passWithNoTests"

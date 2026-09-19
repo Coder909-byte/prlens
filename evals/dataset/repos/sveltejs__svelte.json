@@ -1,0 +1,147 @@
+[
+  {
+    "id": "sveltejs/svelte#16063:revert:15972",
+    "repo": "sveltejs/svelte",
+    "buggyPr": {
+      "number": 15972,
+      "baseSha": "ef48d35a15fc104efd6ee5cf13eceea3ace4ae0d",
+      "headSha": "3b6a0e467acf5f3aa584e12331ea2202a14b332f"
+    },
+    "fixPr": {
+      "number": 16063
+    },
+    "groundTruth": [
+      {
+        "file": "packages/svelte/elements.d.ts",
+        "startLine": 2069,
+        "endLine": 2069
+      },
+      {
+        "file": "packages/svelte/svelte-html.d.ts",
+        "startLine": 11,
+        "endLine": 11
+      },
+      {
+        "file": "packages/svelte/svelte-html.d.ts",
+        "startLine": 253,
+        "endLine": 253
+      }
+    ],
+    "method": "revert",
+    "confidence": "high",
+    "summary": {
+      "fixSummary": "Revert \"feat: enable TS autocomplete for Svelte HTML element definitions\""
+    }
+  },
+  {
+    "id": "sveltejs/svelte#13131:revert:13082",
+    "repo": "sveltejs/svelte",
+    "buggyPr": {
+      "number": 13082,
+      "baseSha": "2af9b193cedab7d4eca48a0571eab4f9546ef5bc",
+      "headSha": "d9088613df1dfdf305847670a9b5b809791ec75b"
+    },
+    "fixPr": {
+      "number": 13131
+    },
+    "groundTruth": [
+      {
+        "file": "packages/svelte/src/compiler/phases/3-transform/client/transform-client.js",
+        "startLine": 460,
+        "endLine": 463
+      }
+    ],
+    "method": "revert",
+    "confidence": "high",
+    "summary": {
+      "fixSummary": "Revert \"fix: hoist imports on top\""
+    }
+  },
+  {
+    "id": "sveltejs/svelte#12931:revert:12921",
+    "repo": "sveltejs/svelte",
+    "buggyPr": {
+      "number": 12921,
+      "baseSha": "0812b10100f8601f1d342ab5b7bbe9b152f5b15b",
+      "headSha": "c74a6f74ce7553034f4558a1f4494dae92d7d0eb"
+    },
+    "fixPr": {
+      "number": 12931
+    },
+    "groundTruth": [
+      {
+        "file": "packages/svelte/src/internal/client/reactivity/sources.js",
+        "startLine": 148,
+        "endLine": 149
+      }
+    ],
+    "method": "revert",
+    "confidence": "high",
+    "summary": {
+      "fixSummary": "Revert \"fix: avoid extra work in mark_reactions\""
+    }
+  },
+  {
+    "id": "sveltejs/svelte#11644:revert:11640",
+    "repo": "sveltejs/svelte",
+    "buggyPr": {
+      "number": 11640,
+      "baseSha": "a7b61c0f30ee6869cf8f956032146a049e250d20",
+      "headSha": "196627cc5c0d8bb0f6be09143f122a2329091427"
+    },
+    "fixPr": {
+      "number": 11644
+    },
+    "groundTruth": [
+      {
+        "file": "packages/svelte/src/internal/client/dom/elements/attributes.js",
+        "startLine": 5,
+        "endLine": 5
+      },
+      {
+        "file": "packages/svelte/src/internal/client/dom/elements/attributes.js",
+        "startLine": 153,
+        "endLine": 159
+      },
+      {
+        "file": "packages/svelte/src/internal/client/dom/elements/events.js",
+        "startLine": 9,
+        "endLine": 16
+      },
+      {
+        "file": "packages/svelte/src/internal/client/dom/elements/events.js",
+        "startLine": 27,
+        "endLine": 41
+      }
+    ],
+    "method": "revert",
+    "confidence": "high",
+    "summary": {
+      "fixSummary": "Revert \"chore: ensure we use event system code paths throughout\""
+    }
+  },
+  {
+    "id": "sveltejs/svelte#11568:revert:11562",
+    "repo": "sveltejs/svelte",
+    "buggyPr": {
+      "number": 11562,
+      "baseSha": "816335f90641896f8340e8d5a98f8b350fe4519a",
+      "headSha": "1dbdc6025ea84ed9e82c9602f70eedb58a42d3aa"
+    },
+    "fixPr": {
+      "number": 11568
+    },
+    "groundTruth": [
+      {
+        "file": "packages/svelte/src/internal/client/dom/elements/actions.js",
+        "startLine": 35,
+        "endLine": 35
+      }
+    ],
+    "method": "revert",
+    "confidence": "high",
+    "summary": {
+      "fixSummary": "Revert \"fix: ensure Svelte action destroy effects are untracked\""
+    }
+  }
+]

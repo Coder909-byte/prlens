@@ -1,0 +1,70 @@
+[
+  {
+    "id": "pydantic/pydantic#5541:revert:5501",
+    "repo": "pydantic/pydantic",
+    "buggyPr": {
+      "number": 5501,
+      "baseSha": "c71b2db3aac13a59bedfc03efc35e6a5acae3597",
+      "headSha": "c8ef5f8d29ea428b314caac1a5ac169e1ebddd07"
+    },
+    "fixPr": {
+      "number": 5541
+    },
+    "groundTruth": [
+      {
+        "file": "pydantic/main.py",
+        "startLine": 295,
+        "endLine": 297
+      }
+    ],
+    "method": "revert",
+    "confidence": "high",
+    "summary": {
+      "fixSummary": "Revert \"feat: allow accessing attributes as strings\""
+    }
+  },
+  {
+    "id": "pydantic/pydantic#1662:revert:1378",
+    "repo": "pydantic/pydantic",
+    "buggyPr": {
+      "number": 1378,
+      "baseSha": "d122b1dbdcd48ea7cf7aa3c33b392e5ab87066e0",
+      "headSha": "0451b33f92279c10910bdf1a12e859f36ec2e51c"
+    },
+    "fixPr": {
+      "number": 1662
+    },
+    "groundTruth": [
+      {
+        "file": "pydantic/decorator.py",
+        "startLine": 17,
+        "endLine": 37
+      },
+      {
+        "file": "pydantic/decorator.py",
+        "startLine": 46,
+        "endLine": 46
+      },
+      {
+        "file": "pydantic/decorator.py",
+        "startLine": 110,
+        "endLine": 110
+      },
+      {
+        "file": "pydantic/decorator.py",
+        "startLine": 180,
+        "endLine": 190
+      },
+      {
+        "file": "pydantic/decorator.py",
+        "startLine": 214,
+        "endLine": 214
+      }
+    ],
+    "method": "revert",
+    "confidence": "high",
+    "summary": {
+      "fixSummary": "Revert \"add `configs` to validate_arguments\""
+    }
+  }
+]

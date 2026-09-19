@@ -1,0 +1,31 @@
+[
+  {
+    "id": "pallets/flask#232:flask/helpers.py",
+    "repo": "pallets/flask",
+    "buggyPr": {
+      "number": null,
+      "baseSha": "d0dc89ea802130e8a3a16b4fba73fa10815c09fb^",
+      "headSha": "d0dc89ea802130e8a3a16b4fba73fa10815c09fb"
+    },
+    "fixPr": {
+      "number": 232
+    },
+    "groundTruth": [
+      {
+        "file": "flask/helpers.py",
+        "startLine": 252,
+        "endLine": 253
+      }
+    ],
+    "method": "issue-link",
+    "confidence": "needs-review",
+    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff",
+    "summary": {
+      "fixSummary": "Fixes Issue #227 where pop causes the session to be modified.",
+      "issueSummary": "get_flashed_messages() always forces session.should_save"
+    },
+    "unusable": {
+      "reason": "introducing commit creates this file from scratch - not a meaningful single-bug introduction"
+    }
+  }
+]
