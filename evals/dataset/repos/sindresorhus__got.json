@@ -19,7 +19,11 @@
     ],
     "method": "issue-link",
     "confidence": "needs-review",
-    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff"
+    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff",
+    "summary": {
+      "fixSummary": "Return an error object on connection failure",
+      "issueSummary": "Return an error object on connection failure"
+    }
   },
   {
     "id": "sindresorhus/got#10:test.js:0",
@@ -41,7 +45,11 @@
     ],
     "method": "issue-link",
     "confidence": "needs-review",
-    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff"
+    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff",
+    "summary": {
+      "fixSummary": "Return an error object on connection failure",
+      "issueSummary": "Return an error object on connection failure"
+    }
   },
   {
     "id": "sindresorhus/got#10:test.js:1",
@@ -63,7 +71,11 @@
     ],
     "method": "issue-link",
     "confidence": "needs-review",
-    "note": "introducing commit's matching hunk is 15+ lines wide (likely a bulk change) - too coarse to trust as a precise bug location"
+    "note": "introducing commit's matching hunk is 15+ lines wide (likely a bulk change) - too coarse to trust as a precise bug location",
+    "summary": {
+      "fixSummary": "Return an error object on connection failure",
+      "issueSummary": "Return an error object on connection failure"
+    }
   },
   {
     "id": "sindresorhus/got#172:index.js",
@@ -85,7 +97,11 @@
     ],
     "method": "issue-link",
     "confidence": "needs-review",
-    "note": "multi-commit PR; could not uniquely re-map the introducing commit's lines to the PR's overall diff by text"
+    "note": "multi-commit PR; could not uniquely re-map the introducing commit's lines to the PR's overall diff by text",
+    "summary": {
+      "fixSummary": "Parse the response body only if it is not empty",
+      "issueSummary": "ParseError on response with no body"
+    }
   },
   {
     "id": "sindresorhus/got#172:test/json.js:0",
@@ -107,7 +123,11 @@
     ],
     "method": "issue-link",
     "confidence": "needs-review",
-    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff"
+    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff",
+    "summary": {
+      "fixSummary": "Parse the response body only if it is not empty",
+      "issueSummary": "ParseError on response with no body"
+    }
   },
   {
     "id": "sindresorhus/got#172:test/json.js:1",
@@ -129,7 +149,11 @@
     ],
     "method": "issue-link",
     "confidence": "needs-review",
-    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff"
+    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff",
+    "summary": {
+      "fixSummary": "Parse the response body only if it is not empty",
+      "issueSummary": "ParseError on response with no body"
+    }
   },
   {
     "id": "sindresorhus/got#230:index.js:0",
@@ -151,7 +175,11 @@
     ],
     "method": "issue-link",
     "confidence": "medium",
-    "note": "multi-commit PR; ground truth re-mapped from the introducing commit to the PR's overall diff by matching line text"
+    "note": "multi-commit PR; ground truth re-mapped from the introducing commit to the PR's overall diff by matching line text",
+    "summary": {
+      "fixSummary": "Add `requestUrl` to response in streaming mode",
+      "issueSummary": "Add `url` property to `got.stream()` request and response objects"
+    }
   },
   {
     "id": "sindresorhus/got#230:index.js:1",
@@ -173,7 +201,11 @@
     ],
     "method": "issue-link",
     "confidence": "needs-review",
-    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff"
+    "note": "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff",
+    "summary": {
+      "fixSummary": "Add `requestUrl` to response in streaming mode",
+      "issueSummary": "Add `url` property to `got.stream()` request and response objects"
+    }
   },
   {
     "id": "sindresorhus/got#230:test/stream.js",
@@ -195,7 +227,11 @@
     ],
     "method": "issue-link",
     "confidence": "medium",
-    "note": "multi-commit PR; ground truth re-mapped from the introducing commit to the PR's overall diff by matching line text"
+    "note": "multi-commit PR; ground truth re-mapped from the introducing commit to the PR's overall diff by matching line text",
+    "summary": {
+      "fixSummary": "Add `requestUrl` to response in streaming mode",
+      "issueSummary": "Add `url` property to `got.stream()` request and response objects"
+    }
   },
   {
     "id": "sindresorhus/got#236:index.js",
@@ -217,6 +253,10 @@
     ],
     "method": "issue-link",
     "confidence": "needs-review",
-    "note": "multi-commit PR; could not uniquely re-map the introducing commit's lines to the PR's overall diff by text"
+    "note": "multi-commit PR; could not uniquely re-map the introducing commit's lines to the PR's overall diff by text",
+    "summary": {
+      "fixSummary": "Add `url` to response",
+      "issueSummary": "'url' property not on response"
+    }
   }
 ]

@@ -6,6 +6,7 @@
   "main": "./src/index.ts",
   "scripts": {
     "mine": "tsx src/index.ts",
+    "backfill-summaries": "tsx src/backfillSummaries.ts",
     "review-data": "tsx src/buildReviewData.ts",
     "build": "tsc --noEmit",
     "test": "vitest run --passWithNoTests"

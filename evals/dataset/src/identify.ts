@@ -2,7 +2,7 @@ import type { Octokit } from "octokit";
 import { lineHistory } from "./clone.js";
 import { addedRange, parseHunks } from "./diffText.js";
 import { deriveGroundTruth, resolveOwningPr } from "./groundTruth.js";
-import type { MinedPair, PairConfidence } from "./types.js";
+import type { MinedPair, PairConfidence, PairSummary } from "./types.js";
 
 const FIX_KEYWORDS = /\b(fix|fixes|fixed|bug|crash|incorrect|wrong|regression)\b/i;
 const LINK_KEYWORDS = /\b(?:fixes?|closes?|resolves?)\s+#(\d+)/gi;
@@ -21,6 +21,25 @@ export const NON_CODE_FILE = /(^|\/)(readme|changelog|license|authors|contributi
 async function withinSizeLimit(octokit: Octokit, owner: string, repo: string, prNumber: number): Promise<boolean> {
   const { data } = await octokit.rest.pulls.get({ owner, repo, pull_number: prNumber });
   return data.changed_files <= MAX_FILES && data.additions + data.deletions <= MAX_CHANGED_LINES;
+}
+
+/** Best-effort issue title lookup for a "fixes #N" reference - never throws, since #N can be a PR, a cross-repo reference gone wrong, or deleted. */
+async function fetchIssueTitle(octokit: Octokit, owner: string, repo: string, issueNumber: number): Promise<string | undefined> {
+  try {
+    const { data } = await octokit.rest.issues.get({ owner, repo, issue_number: issueNumber });
+    return data.title;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Mechanical, unverified: the fix PR's own title plus (when resolvable) the title of the issue it says it fixes. Never an LLM call, never checked against the actual diff. */
+async function buildSummary(octokit: Octokit, owner: string, repo: string, fixTitle: string, linkText: string): Promise<PairSummary> {
+  const match = LINK_KEYWORDS.exec(linkText);
+  LINK_KEYWORDS.lastIndex = 0; // the regex has the global flag - reset shared state between calls
+  const issueNumber = match?.[1] ? Number(match[1]) : undefined;
+  const issueSummary = issueNumber !== undefined ? await fetchIssueTitle(octokit, owner, repo, issueNumber) : undefined;
+  return { fixSummary: fixTitle, issueSummary };
 }
 
 /** Per-hunk added-line ranges for one file's patch - a file with two unrelated hunks yields two separate ranges, never one span covering both. */
@@ -77,6 +96,9 @@ export async function findRevertPairs(
 
     if (groundTruth.length === 0) continue;
 
+    const { data: fixPrData } = await octokit.rest.pulls.get({ owner, repo: name, pull_number: fix.prNumber });
+    const summary = await buildSummary(octokit, owner, name, fixPrData.title, `${fixPrData.title}\n${fixPrData.body ?? ""}`);
+
     pairs.push({
       id: `${owner}/${name}#${fix.prNumber}:revert:${reverted.prNumber}`,
       repo: `${owner}/${name}`,
@@ -85,6 +107,7 @@ export async function findRevertPairs(
       groundTruth,
       method: "revert",
       confidence: "high",
+      summary,
     });
   }
 
@@ -111,7 +134,7 @@ export async function findIssueLinkPairs(
   afterPrNumber: number,
   alreadyProcessed: Set<number>,
   limit: number,
-  onPrProcessed: (prNumber: number, outcome: PrOutcome) => void,
+  onPrProcessed: (prNumber: number, outcome: PrOutcome, pairs: MinedPair[]) => void,
 ): Promise<{ pairs: MinedPair[]; prsScanned: number; lastPrNumber: number }> {
   const pairs: MinedPair[] = [];
   let prsScanned = 0;
@@ -139,20 +162,21 @@ export async function findIssueLinkPairs(
 
       const text = `${pr.title}\n${pr.body ?? ""}`;
       if (!FIX_KEYWORDS.test(text)) {
-        onPrProcessed(pr.number, "filtered");
+        onPrProcessed(pr.number, "filtered", []);
         continue;
       }
       if (![...text.matchAll(LINK_KEYWORDS)].length) {
-        onPrProcessed(pr.number, "filtered"); // no link -> blame-only tier, excluded from this dataset
+        onPrProcessed(pr.number, "filtered", []); // no link -> blame-only tier, excluded from this dataset
         continue;
       }
 
       if (!(await withinSizeLimit(octokit, owner, name, pr.number))) {
-        onPrProcessed(pr.number, "filtered");
+        onPrProcessed(pr.number, "filtered", []);
         continue;
       }
 
       const pairsForThisPr: MinedPair[] = [];
+      const summary = await buildSummary(octokit, owner, name, pr.title, text);
       const { data: files } = await octokit.rest.pulls.listFiles({ owner, repo: name, pull_number: pr.number, per_page: 100 });
 
       for (const file of files) {
@@ -185,6 +209,7 @@ export async function findIssueLinkPairs(
               method: "issue-link",
               confidence: "needs-review",
               note: note ?? "introducing commit has no owning PR (direct push to default branch) - ground truth is that commit's own diff",
+              summary,
             });
             continue;
           }
@@ -198,6 +223,7 @@ export async function findIssueLinkPairs(
               method: "issue-link",
               confidence: "needs-review",
               note: note ?? "introducing commit is associated with more than one PR (backport/cherry-pick?)",
+              summary,
             });
             continue;
           }
@@ -224,17 +250,18 @@ export async function findIssueLinkPairs(
             method: "issue-link",
             confidence: confidence === "needs-review" ? "needs-review" : gt.confidence,
             note: note ?? gt.note,
+            summary,
           });
         }
       }
 
       pairs.push(...pairsForThisPr);
       if (pairsForThisPr.length === 0) {
-        onPrProcessed(pr.number, "filtered");
+        onPrProcessed(pr.number, "filtered", pairsForThisPr);
       } else if (pairsForThisPr.every((p) => p.confidence === "needs-review")) {
-        onPrProcessed(pr.number, "needs-review");
+        onPrProcessed(pr.number, "needs-review", pairsForThisPr);
       } else {
-        onPrProcessed(pr.number, "accepted");
+        onPrProcessed(pr.number, "accepted", pairsForThisPr);
       }
     }
   }
