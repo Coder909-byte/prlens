@@ -1,6 +1,6 @@
 # Eval comparison — diff-only vs. repo-aware
 
-Generated: 2026-09-20T05:55:24.035Z
+Generated: 2026-09-20T06:47:05.907Z
 Provider: groq · model: default
 
 > **Note on dataset size**: Dataset too small (11 accepted pairs) to hold out a test split - all accepted pairs are assigned to "dev" and used as the single evaluation set. No "test" split exists yet; --split test in the runner is reserved for when the dataset grows.

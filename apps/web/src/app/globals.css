@@ -1,0 +1,95 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens extracted from the approved design
+ * (claude.ai/artifact/YCUG4Q99F4po5S7cqnwE1d) - every color/radius the
+ * screens use, named, so components reference tokens instead of hex
+ * literals. Two background scales exist on purpose: the dashboard (Main/
+ * Reviews/ReviewDetail) uses --color-bg (#0e1115); the public Benchmark
+ * page is one shade darker (--color-bg-public, #0b0d10), matching the
+ * design exactly rather than forcing one background everywhere.
+ */
+@theme {
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --color-bg: #0e1115;
+  --color-bg-public: #0b0d10;
+  --color-sidebar: #0a0c0f;
+
+  --color-surface: #13171c;
+  --color-surface-header: #161a20;
+  --color-surface-header-alt: #151a1f;
+  --color-surface-sunken: #111418;
+  --color-surface-deep: #0f1216;
+  --color-code-bg: #0b0d10;
+
+  --color-border: #222831;
+  --color-border-strong: #262c35;
+  --color-border-header: #1f242b;
+  --color-border-row: #1a1e24;
+  --color-border-sidebar: #1d2229;
+  --color-border-dashed: #2b313a;
+
+  --color-text: #e6e9ee;
+  --color-text-strong: #eef1f4;
+  --color-text-brightest: #f3f5f7;
+  --color-text-secondary: #d5dae1;
+  --color-text-tertiary: #c3c9d1;
+  --color-text-muted: #a4acb7;
+  --color-text-faint: #8a939f;
+  --color-text-dim: #7d8692;
+  --color-text-dimmer: #6b737e;
+  --color-text-disabled: #4a525d;
+  --color-text-disabled-2: #3d444e;
+
+  --color-accent: #5fd4a6;
+  --color-accent-fg: #062117;
+  --color-accent-link: #7fdcb5;
+  --color-accent-link-hover: #b3f0d4;
+
+  --color-mode-repo-aware: #5fd4a6;
+  --color-mode-repo-aware-bg: rgba(95, 212, 166, 0.1);
+  --color-mode-diff-only: #a9b8cc;
+  --color-mode-diff-only-bg: rgba(169, 184, 204, 0.09);
+
+  --color-sev-critical: #ff6b6b;
+  --color-sev-critical-fg: #ff8080;
+  --color-sev-critical-bg: rgba(255, 107, 107, 0.12);
+  --color-sev-critical-border: rgba(255, 107, 107, 0.35);
+  --color-sev-high: #ff9f43;
+  --color-sev-high-fg: #ffb067;
+  --color-sev-high-bg: rgba(255, 159, 67, 0.12);
+  --color-sev-high-border: rgba(255, 159, 67, 0.35);
+  --color-sev-medium: #e8c547;
+  --color-sev-medium-fg: #ecd06a;
+  --color-sev-medium-bg: rgba(232, 197, 71, 0.1);
+  --color-sev-medium-border: rgba(232, 197, 71, 0.32);
+  --color-sev-low: #6ab7ff;
+  --color-sev-low-fg: #8cc7ff;
+  --color-sev-low-bg: rgba(106, 183, 255, 0.1);
+  --color-sev-low-border: rgba(106, 183, 255, 0.32);
+
+  --color-warning: #c9a94a;
+
+  --radius-card: 0.5rem;
+  --radius-card-lg: 0.75rem;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--color-accent-link);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--color-accent-link-hover);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}

@@ -97,6 +97,11 @@ model Finding {
   suggestedFix String
   confidence   Float
   postedInline Boolean
+  // Populated only for repo-aware findings once apps/worker gains repo-aware
+  // posting (M3 built repo-aware review as eval-only infrastructure - it
+  // never ran in production). Null for every row today; the dashboard
+  // renders its "no context retrieved" state whenever this is null.
+  retrievedContext Json?
 
   @@index([reviewId])
 }

@@ -1,8 +1,10 @@
+import { writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { loadPrompt, DIFF_ONLY_PROMPT_VERSION, REPO_AWARE_PROMPT_VERSION } from "@prlens/reviewer";
 import { cacheKey, hashPromptText, readCache, type CacheEntry } from "./cache.js";
 import { loadPairsForSplit, getSplitNote } from "./splits.js";
-import { scoreFindings, aggregate, aggregateByRepo, type PairScore } from "./scoring.js";
-import { writeReport } from "./report.js";
+import { scoreFindings, aggregate, aggregateByRepo, type AggregateStats, type PairScore } from "./scoring.js";
+import { writeReport, REPORTS_DIR } from "./report.js";
 import type { MinedPair, SplitName } from "./types.js";
 
 interface ModeRun {
@@ -146,7 +148,45 @@ async function main(): Promise<void> {
 
   const date = new Date().toISOString().slice(0, 10);
   const path = writeReport(`${date}-comparison-${split}.md`, lines.join("\n"));
+
+  // Structured sidecar for apps/web's /benchmark page - parsing the prose
+  // markdown above for a real UI would be fragile; this is the same
+  // aggregate/per-pair data as real JS objects, written once instead of
+  // re-derived by regex.
+  const jsonReport = {
+    generatedAt: new Date().toISOString(),
+    split,
+    provider,
+    model,
+    splitNote: getSplitNote(),
+    overall: {
+      diffOnly: diffOnlyAgg,
+      repoAware: repoAwareAgg,
+      extraInputTokensAvg: avgExtraInputTokens,
+      extraCostUsd: extraCost,
+    },
+    byRepo: Object.fromEntries(
+      [...new Set(pairs.map((p) => p.repo))].sort().map((repo) => [repo, { diffOnly: diffOnlyByRepo.get(repo) as AggregateStats, repoAware: repoAwareByRepo.get(repo) as AggregateStats }]),
+    ),
+    pairs: runs.map((r) => ({
+      id: r.pair.id,
+      repo: r.pair.repo,
+      method: r.pair.method,
+      confidence: r.pair.confidence,
+      diffOnlyCaught: r.diffOnly!.score.caught,
+      diffOnlyCostUsd: r.diffOnly!.score.costUsd,
+      diffOnlyLatencyMs: r.diffOnly!.score.latencyMs,
+      repoAwareCaught: r.repoAware!.score.caught,
+      repoAwareCostUsd: r.repoAware!.score.costUsd,
+      repoAwareLatencyMs: r.repoAware!.score.latencyMs,
+      divergenceNote: describeDivergence(r.pair.id, r.diffOnly, r.repoAware) || null,
+    })),
+  };
+  const jsonPath = join(REPORTS_DIR, `${date}-comparison-${split}.json`);
+  writeFileSync(jsonPath, JSON.stringify(jsonReport, null, 2));
+
   console.log(`[compare] report written to ${path}`);
+  console.log(`[compare] JSON sidecar written to ${jsonPath}`);
 }
 
 main().catch((err: unknown) => {
