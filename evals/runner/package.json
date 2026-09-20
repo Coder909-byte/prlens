@@ -6,12 +6,14 @@
   "main": "./src/index.ts",
   "scripts": {
     "eval": "tsx src/index.ts",
+    "compare": "tsx src/compare.ts",
     "build": "tsc --noEmit",
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
     "@prlens/reviewer": "workspace:*",
     "@prlens/shared": "workspace:*",
+    "@prlens/indexer": "workspace:*",
     "octokit": "^5.0.0"
   },
   "devDependencies": {

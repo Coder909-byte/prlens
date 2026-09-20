@@ -4,8 +4,10 @@ import { resolveLanguageModel } from "./model.js";
 import { FindingsSchema, type Finding } from "./schema.js";
 import { loadPrompt } from "./prompt.js";
 import { buildDiffText } from "./diffText.js";
+import { buildRepoContextText } from "./repoContext.js";
 import type { IncludedFile, SkippedFile } from "./diffFilter.js";
 import { isRetryableProviderError, summarizeProviderError } from "./providerErrors.js";
+import type { RetrievedContext } from "@prlens/indexer";
 
 /** Single source of truth for "which prompt file is current" - the eval runner
  * loads the same file by this name to hash its content for cache keys. */
@@ -137,10 +139,12 @@ async function attemptProvider(
  * aborted and no further providers are tried, so one review job's worst-case
  * latency doesn't scale with how many fallback providers are configured.
  */
-export async function runDiffOnlyReview(
+async function runReviewInternal(
   files: IncludedFile[],
   skipped: SkippedFile[],
-  options: ReviewOptions = {},
+  promptVersion: string,
+  extraSection: string,
+  options: ReviewOptions,
 ): Promise<ReviewOutcome> {
   const primary = options.provider ?? config.LLM_PROVIDER;
   // config.LLM_MODEL was tuned for config.LLM_PROVIDER - only fall back to it
@@ -154,8 +158,8 @@ export async function runDiffOnlyReview(
   const { provider: primaryProvider, modelId: primaryModelId } = resolveLanguageModel(primary, primaryModelOverride);
   const providersToTry: LlmProvider[] = [primary, ...fallbackProviders.filter((p) => p !== primary)];
 
-  const system = loadPrompt(DIFF_ONLY_PROMPT_VERSION) + (reportMissingTests ? "" : MISSING_TEST_DISABLED_NOTE);
-  const baseDiffText = buildDiffText(files, skipped);
+  const system = loadPrompt(promptVersion) + (reportMissingTests ? "" : MISSING_TEST_DISABLED_NOTE);
+  const baseDiffText = buildDiffText(files, skipped) + extraSection;
   const usage = { inputTokens: 0, outputTokens: 0 };
 
   const timeoutMs = config.LLM_REVIEW_TIMEOUT_SECONDS * 1000;
@@ -195,4 +199,34 @@ export async function runDiffOnlyReview(
     throw new Error(`Review exceeded the ${config.LLM_REVIEW_TIMEOUT_SECONDS}s time budget (LLM_REVIEW_TIMEOUT_SECONDS)`);
   }
   throw new Error(`All LLM providers failed with a retryable error: ${providersToTry.join(", ")}`);
+}
+
+export async function runDiffOnlyReview(
+  files: IncludedFile[],
+  skipped: SkippedFile[],
+  options: ReviewOptions = {},
+): Promise<ReviewOutcome> {
+  return runReviewInternal(files, skipped, DIFF_ONLY_PROMPT_VERSION, "", options);
+}
+
+/** Single source of truth for "which repo-aware prompt file is current" - mirrors DIFF_ONLY_PROMPT_VERSION. */
+export const REPO_AWARE_PROMPT_VERSION = "repo-aware.v1.md";
+
+/**
+ * Same pipeline as runDiffOnlyReview, plus a "## Repository Context"
+ * section (built from retrieveContext results, one per changed hunk)
+ * appended after the diff - clearly separated so the model can tell "the
+ * actual change" from "automatically retrieved, possibly wrong"
+ * background. CLAUDE.md requires both modes to always exist as separate,
+ * explicit entry points rather than one function with a mode flag.
+ */
+export async function runRepoAwareReview(
+  files: IncludedFile[],
+  skipped: SkippedFile[],
+  retrievedContexts: RetrievedContext[],
+  options: ReviewOptions = {},
+): Promise<ReviewOutcome> {
+  const contextSection = buildRepoContextText(retrievedContexts);
+  const extraSection = contextSection ? `\n\n${contextSection}` : "";
+  return runReviewInternal(files, skipped, REPO_AWARE_PROMPT_VERSION, extraSection, options);
 }

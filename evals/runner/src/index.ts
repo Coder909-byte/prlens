@@ -1,7 +1,7 @@
 import { createInterface } from "node:readline/promises";
 import { appendFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { loadPrompt, DIFF_ONLY_PROMPT_VERSION } from "@prlens/reviewer";
+import { loadPrompt, DIFF_ONLY_PROMPT_VERSION, REPO_AWARE_PROMPT_VERSION } from "@prlens/reviewer";
 import { createEvalOctokit } from "./github.js";
 import { loadPairsForSplit, getSplitNote } from "./splits.js";
 import { runEval } from "./runEval.js";
@@ -63,8 +63,10 @@ async function main(): Promise<void> {
   const options = parseArgs(process.argv.slice(2));
   const pairs = loadPairsForSplit(options.split);
 
+  const promptVersion = options.mode === "repo-aware" ? REPO_AWARE_PROMPT_VERSION : DIFF_ONLY_PROMPT_VERSION;
+
   if (options.split === "test") {
-    const promptHash = hashPromptText(loadPrompt(DIFF_ONLY_PROMPT_VERSION));
+    const promptHash = hashPromptText(loadPrompt(promptVersion));
     await confirmTestSplit(options, promptHash);
   }
 
@@ -85,7 +87,7 @@ async function main(): Promise<void> {
       mode: options.mode,
       provider: options.provider,
       model: options.model ?? "default",
-      promptVersion: DIFF_ONLY_PROMPT_VERSION,
+      promptVersion,
       splitNote: getSplitNote(),
       generatedAt: new Date().toISOString(),
     },
@@ -93,7 +95,7 @@ async function main(): Promise<void> {
   );
 
   const date = new Date().toISOString().slice(0, 10);
-  const filename = `${date}-${options.mode}-${options.provider}-${options.model ?? "default"}-${DIFF_ONLY_PROMPT_VERSION.replace(/\.md$/, "")}-${options.split}.md`;
+  const filename = `${date}-${options.mode}-${options.provider}-${options.model ?? "default"}-${promptVersion.replace(/\.md$/, "")}-${options.split}.md`;
   const path = writeReport(filename, report);
   console.log(`[eval] report written to ${path}`);
 }

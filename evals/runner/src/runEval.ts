@@ -1,7 +1,17 @@
 import { config, computeCostUsd } from "@prlens/shared";
-import { filterDiffFiles, runDiffOnlyReview, loadPrompt, DIFF_ONLY_PROMPT_VERSION, type PrFile } from "@prlens/reviewer";
+import {
+  filterDiffFiles,
+  runDiffOnlyReview,
+  runRepoAwareReview,
+  loadPrompt,
+  DIFF_ONLY_PROMPT_VERSION,
+  REPO_AWARE_PROMPT_VERSION,
+  type PrFile,
+} from "@prlens/reviewer";
+import { ensureIndex, retrieveContext, type RetrievedContext } from "@prlens/indexer";
 import type { Octokit } from "octokit";
 import { cacheKey, hashPromptText, readCache, writeCache, type CacheEntry } from "./cache.js";
+import { extractHunks } from "./hunks.js";
 import { RateLimiter } from "./rateLimit.js";
 import { scoreFindings, type PairScore } from "./scoring.js";
 import type { MinedPair, RunOptions } from "./types.js";
@@ -22,13 +32,13 @@ export interface EvalRunResult {
   cacheMisses: number;
 }
 
-export async function runEval(pairs: MinedPair[], octokit: Octokit, options: RunOptions): Promise<EvalRunResult> {
-  if (options.mode === "repo-aware") {
-    throw new Error("repo-aware mode isn't built yet (Milestone 3 Step 4) - only --mode diff-only is available so far.");
-  }
+function promptVersionFor(mode: RunOptions["mode"]): string {
+  return mode === "repo-aware" ? REPO_AWARE_PROMPT_VERSION : DIFF_ONLY_PROMPT_VERSION;
+}
 
-  const promptText = loadPrompt(DIFF_ONLY_PROMPT_VERSION);
-  const promptHash = hashPromptText(promptText);
+export async function runEval(pairs: MinedPair[], octokit: Octokit, options: RunOptions): Promise<EvalRunResult> {
+  const promptVersion = promptVersionFor(options.mode);
+  const promptHash = hashPromptText(loadPrompt(promptVersion));
   const rateLimiter = new RateLimiter(options.rpm);
 
   // Pre-flight: how many pairs actually need an LLM call (cache misses only).
@@ -61,14 +71,32 @@ export async function runEval(pairs: MinedPair[], octokit: Octokit, options: Run
       cacheMisses++;
       await rateLimiter.acquire();
       const startedAt = Date.now();
+
       const files = await fetchIntroducingFiles(octokit, pair.repo, pair);
       const { included, skipped } = filterDiffFiles(files, config.MAX_DIFF_BYTES);
-      const outcome = await runDiffOnlyReview(included, skipped, {
+
+      const reviewOptions = {
         provider: options.provider,
         model: options.model,
         fallbackProviders: [], // eval runs must be single-provider, no silent fallback
         reportMissingTests: false,
-      });
+      };
+
+      let retrievedContexts: RetrievedContext[] | undefined;
+      const outcome =
+        options.mode === "diff-only"
+          ? await runDiffOnlyReview(included, skipped, reviewOptions)
+          : await (async () => {
+              const [owner, name] = pair.repo.split("/") as [string, string];
+              // Indexed at the introducing PR's BASE sha - the diff already
+              // shows the changed code, retrieval's job is the pre-existing
+              // context the diff doesn't show (see packages/indexer's plan).
+              const index = await ensureIndex(owner, name, pair.buggyPr.baseSha);
+              const hunks = extractHunks(included);
+              retrievedContexts = hunks.map((hunk) => retrieveContext(index, hunk, options.contextTokens));
+              return runRepoAwareReview(included, skipped, retrievedContexts, reviewOptions);
+            })();
+
       const latencyMs = Date.now() - startedAt;
       const costUsd = computeCostUsd(outcome.provider, outcome.model, outcome.usage.inputTokens, outcome.usage.outputTokens);
 
@@ -77,13 +105,14 @@ export async function runEval(pairs: MinedPair[], octokit: Octokit, options: Run
         mode: options.mode,
         provider: outcome.provider,
         model: outcome.model,
-        promptVersion: DIFF_ONLY_PROMPT_VERSION,
+        promptVersion,
         findings: outcome.findings,
         inputTokens: outcome.usage.inputTokens,
         outputTokens: outcome.usage.outputTokens,
         costUsd,
         latencyMs,
         failed: outcome.failed,
+        retrievedContext: retrievedContexts,
       };
       writeCache(key, entry);
     }

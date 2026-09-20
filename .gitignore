@@ -23,3 +23,6 @@ evals/runner/.cache/
 # the test-split audit log is committed on purpose (enforces never-tune-on-test after
 # the fact) - un-ignore it despite the blanket *.log rule above.
 !evals/reports/test-runs.log
+# indexer: checked-out repo clones and the symbol/call-graph cache are both derived/regenerable.
+packages/indexer/.repos/
+packages/indexer/.cache/

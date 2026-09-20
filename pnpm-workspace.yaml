@@ -8,5 +8,9 @@ allowBuilds:
   esbuild: true
   msgpackr-extract: true
   prisma: true
+  tree-sitter: true
+  tree-sitter-javascript: true
+  tree-sitter-python: true
+  tree-sitter-typescript: true
 minimumReleaseAgeExclude:
   - pg-boss@12.33.1
