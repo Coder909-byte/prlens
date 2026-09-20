@@ -1,9 +1,0 @@
-{
-  "/_not-found/page": "/_not-found",
-  "/api/auth/[...nextauth]/route": "/api/auth/[...nextauth]",
-  "/sign-in/page": "/sign-in",
-  "/reviews/page": "/reviews",
-  "/page": "/",
-  "/reviews/[id]/page": "/reviews/[id]",
-  "/benchmark/page": "/benchmark"
-}
