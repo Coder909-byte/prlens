@@ -100,6 +100,9 @@ importers:
       '@prlens/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@prlens/indexer':
+        specifier: workspace:*
+        version: link:../../packages/indexer
       '@prlens/reviewer':
         specifier: workspace:*
         version: link:../../packages/reviewer

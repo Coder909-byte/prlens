@@ -9,6 +9,7 @@ export {
   type ReviewOutcome,
 } from "./review.js";
 export { buildRepoContextText } from "./repoContext.js";
+export { extractHunks } from "./hunks.js";
 export { loadPrompt } from "./prompt.js";
 export { formatReview, type FormattedReview, type InlineComment } from "./commentFormatter.js";
 export { FindingSchema, FindingsSchema, type Finding, type Findings } from "./schema.js";

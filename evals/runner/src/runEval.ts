@@ -4,6 +4,7 @@ import {
   runDiffOnlyReview,
   runRepoAwareReview,
   loadPrompt,
+  extractHunks,
   DIFF_ONLY_PROMPT_VERSION,
   REPO_AWARE_PROMPT_VERSION,
   type PrFile,
@@ -11,13 +12,12 @@ import {
 import { ensureIndex, retrieveContext, type RetrievedContext } from "@prlens/indexer";
 import type { Octokit } from "octokit";
 import { cacheKey, hashPromptText, readCache, writeCache, type CacheEntry } from "./cache.js";
-import { extractHunks } from "./hunks.js";
 import { RateLimiter } from "./rateLimit.js";
 import { scoreFindings, type PairScore } from "./scoring.js";
 import type { MinedPair, RunOptions } from "./types.js";
 
 /** The PR (or, for a PR-less direct push, the commit) actually reviewed - always the INTRODUCING side, since the benchmark measures whether review at introduction time would have caught the bug (CLAUDE.md's dataset definition), not whether the later fix looks reasonable. */
-async function fetchIntroducingFiles(octokit: Octokit, repo: string, pair: MinedPair): Promise<PrFile[]> {
+export async function fetchIntroducingFiles(octokit: Octokit, repo: string, pair: MinedPair): Promise<PrFile[]> {
   const [owner, name] = repo.split("/") as [string, string];
   if (pair.buggyPr.number !== null) {
     return octokit.paginate(octokit.rest.pulls.listFiles, { owner, repo: name, pull_number: pair.buggyPr.number, per_page: 100 });
@@ -88,10 +88,16 @@ export async function runEval(pairs: MinedPair[], octokit: Octokit, options: Run
           ? await runDiffOnlyReview(included, skipped, reviewOptions)
           : await (async () => {
               const [owner, name] = pair.repo.split("/") as [string, string];
-              // Indexed at the introducing PR's BASE sha - the diff already
-              // shows the changed code, retrieval's job is the pre-existing
-              // context the diff doesn't show (see packages/indexer's plan).
-              const index = await ensureIndex(owner, name, pair.buggyPr.baseSha);
+              // Indexed at the introducing PR's HEAD sha, not base - a
+              // symbol (and everything it calls) can be introduced by the
+              // introducing PR itself, in which case it doesn't exist at
+              // base sha at all and smallestOverlapping (packages/indexer's
+              // retrieve.ts) would silently misattribute the hunk to an
+              // unrelated pre-existing symbol. Head sha is a strict superset
+              // of base for this purpose: every pre-existing caller/callee
+              // this was designed to find is still present post-PR, matching
+              // apps/worker/src/reviewPullRequest.ts's production behavior.
+              const index = await ensureIndex(owner, name, pair.buggyPr.headSha);
               const hunks = extractHunks(included);
               retrievedContexts = hunks.map((hunk) => retrieveContext(index, hunk, options.contextTokens));
               return runRepoAwareReview(included, skipped, retrievedContexts, reviewOptions);

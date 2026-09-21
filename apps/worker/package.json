@@ -6,11 +6,13 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc --noEmit",
+    "start": "tsx src/index.ts",
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
     "@prlens/shared": "workspace:*",
     "@prlens/reviewer": "workspace:*",
+    "@prlens/indexer": "workspace:*",
     "@prlens/db": "workspace:*",
     "pg-boss": "^12.33.1",
     "@octokit/app": "^16.1.0",

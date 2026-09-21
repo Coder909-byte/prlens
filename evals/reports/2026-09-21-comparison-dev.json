@@ -1,0 +1,310 @@
+{
+  "generatedAt": "2026-09-21T11:05:00.703Z",
+  "split": "dev",
+  "provider": "groq",
+  "model": "default",
+  "splitNote": "Dataset too small (11 accepted pairs) to hold out a test split - all accepted pairs are assigned to \"dev\" and used as the single evaluation set. No \"test\" split exists yet; --split test in the runner is reserved for when the dataset grows.",
+  "overall": {
+    "diffOnly": {
+      "pairCount": 11,
+      "recall": 0.36363636363636365,
+      "fpPerPr": 0,
+      "avgCostUsd": 0.0005229818181818181,
+      "totalCostUsd": 0.0057528,
+      "p50LatencyMs": 2677,
+      "p95LatencyMs": 16592,
+      "failedCount": 0
+    },
+    "repoAware": {
+      "pairCount": 11,
+      "recall": 0.5454545454545454,
+      "fpPerPr": 0,
+      "avgCostUsd": 0.0009513545454545454,
+      "totalCostUsd": 0.0104649,
+      "p50LatencyMs": 9843,
+      "p95LatencyMs": 48980,
+      "failedCount": 0
+    },
+    "extraInputTokensAvg": 1599.090909090909,
+    "extraCostUsd": 0.0047120999999999994
+  },
+  "byRepo": {
+    "axios/axios": {
+      "diffOnly": {
+        "pairCount": 4,
+        "recall": 0.5,
+        "fpPerPr": 0,
+        "avgCostUsd": 0.0005334,
+        "totalCostUsd": 0.0021336,
+        "p50LatencyMs": 2514,
+        "p95LatencyMs": 2837,
+        "failedCount": 0
+      },
+      "repoAware": {
+        "pairCount": 4,
+        "recall": 0.75,
+        "fpPerPr": 0,
+        "avgCostUsd": 0.0007147874999999999,
+        "totalCostUsd": 0.0028591499999999995,
+        "p50LatencyMs": 7854,
+        "p95LatencyMs": 9843,
+        "failedCount": 0
+      }
+    },
+    "date-fns/date-fns": {
+      "diffOnly": {
+        "pairCount": 1,
+        "recall": 0,
+        "fpPerPr": 0,
+        "avgCostUsd": 0.00017295,
+        "totalCostUsd": 0.00017295,
+        "p50LatencyMs": 1124,
+        "p95LatencyMs": 1124,
+        "failedCount": 0
+      },
+      "repoAware": {
+        "pairCount": 1,
+        "recall": 0,
+        "fpPerPr": 0,
+        "avgCostUsd": 0.0001971,
+        "totalCostUsd": 0.0001971,
+        "p50LatencyMs": 22105,
+        "p95LatencyMs": 22105,
+        "failedCount": 0
+      }
+    },
+    "encode/httpx": {
+      "diffOnly": {
+        "pairCount": 1,
+        "recall": 0,
+        "fpPerPr": 0,
+        "avgCostUsd": 0.00049995,
+        "totalCostUsd": 0.00049995,
+        "p50LatencyMs": 2064,
+        "p95LatencyMs": 2064,
+        "failedCount": 0
+      },
+      "repoAware": {
+        "pairCount": 1,
+        "recall": 0,
+        "fpPerPr": 0,
+        "avgCostUsd": 0.00120045,
+        "totalCostUsd": 0.00120045,
+        "p50LatencyMs": 10525,
+        "p95LatencyMs": 10525,
+        "failedCount": 0
+      }
+    },
+    "psf/requests": {
+      "diffOnly": {
+        "pairCount": 1,
+        "recall": 1,
+        "fpPerPr": 0,
+        "avgCostUsd": 0.00084405,
+        "totalCostUsd": 0.00084405,
+        "p50LatencyMs": 15519,
+        "p95LatencyMs": 15519,
+        "failedCount": 0
+      },
+      "repoAware": {
+        "pairCount": 1,
+        "recall": 1,
+        "fpPerPr": 0,
+        "avgCostUsd": 0.0016565999999999998,
+        "totalCostUsd": 0.0016565999999999998,
+        "p50LatencyMs": 5601,
+        "p95LatencyMs": 5601,
+        "failedCount": 0
+      }
+    },
+    "python-poetry/poetry": {
+      "diffOnly": {
+        "pairCount": 1,
+        "recall": 0,
+        "fpPerPr": 0,
+        "avgCostUsd": 0.00023385,
+        "totalCostUsd": 0.00023385,
+        "p50LatencyMs": 10426,
+        "p95LatencyMs": 10426,
+        "failedCount": 0
+      },
+      "repoAware": {
+        "pairCount": 1,
+        "recall": 1,
+        "fpPerPr": 0,
+        "avgCostUsd": 0.00099585,
+        "totalCostUsd": 0.00099585,
+        "p50LatencyMs": 14667,
+        "p95LatencyMs": 14667,
+        "failedCount": 0
+      }
+    },
+    "sveltejs/svelte": {
+      "diffOnly": {
+        "pairCount": 3,
+        "recall": 0.3333333333333333,
+        "fpPerPr": 0,
+        "avgCostUsd": 0.0006228000000000001,
+        "totalCostUsd": 0.0018684,
+        "p50LatencyMs": 15769,
+        "p95LatencyMs": 16592,
+        "failedCount": 0
+      },
+      "repoAware": {
+        "pairCount": 3,
+        "recall": 0.3333333333333333,
+        "fpPerPr": 0,
+        "avgCostUsd": 0.0011852499999999999,
+        "totalCostUsd": 0.00355575,
+        "p50LatencyMs": 27127,
+        "p95LatencyMs": 48980,
+        "failedCount": 0
+      }
+    }
+  },
+  "pairs": [
+    {
+      "id": "axios/axios#4699:revert:4550",
+      "repo": "axios/axios",
+      "method": "revert",
+      "confidence": "high",
+      "diffOnlyCaught": true,
+      "diffOnlyCostUsd": 0.0006041999999999999,
+      "diffOnlyLatencyMs": 2677,
+      "repoAwareCaught": true,
+      "repoAwareCostUsd": 0.0008422499999999999,
+      "repoAwareLatencyMs": 9843,
+      "divergenceNote": null
+    },
+    {
+      "id": "axios/axios#3289:revert:1773",
+      "repo": "axios/axios",
+      "method": "revert",
+      "confidence": "high",
+      "diffOnlyCaught": false,
+      "diffOnlyCostUsd": 0.00026895,
+      "diffOnlyLatencyMs": 1151,
+      "repoAwareCaught": false,
+      "repoAwareCostUsd": 0.00047924999999999997,
+      "repoAwareLatencyMs": 7559,
+      "divergenceNote": null
+    },
+    {
+      "id": "axios/axios#2982:revert:1511",
+      "repo": "axios/axios",
+      "method": "revert",
+      "confidence": "high",
+      "diffOnlyCaught": true,
+      "diffOnlyCostUsd": 0.0006783,
+      "diffOnlyLatencyMs": 2837,
+      "repoAwareCaught": true,
+      "repoAwareCostUsd": 0.00070125,
+      "repoAwareLatencyMs": 7854,
+      "divergenceNote": null
+    },
+    {
+      "id": "axios/axios#2977:revert:1258",
+      "repo": "axios/axios",
+      "method": "revert",
+      "confidence": "high",
+      "diffOnlyCaught": false,
+      "diffOnlyCostUsd": 0.00058215,
+      "diffOnlyLatencyMs": 2514,
+      "repoAwareCaught": true,
+      "repoAwareCostUsd": 0.0008364,
+      "repoAwareLatencyMs": 8373,
+      "divergenceNote": "**axios/axios#2977:revert:1258**: repo-aware caught it, diff-only didn't. Retrieval surfaced 6 relevant item(s) - plausibly what tipped the finding."
+    },
+    {
+      "id": "date-fns/date-fns#1256:revert:1233",
+      "repo": "date-fns/date-fns",
+      "method": "revert",
+      "confidence": "high",
+      "diffOnlyCaught": false,
+      "diffOnlyCostUsd": 0.00017295,
+      "diffOnlyLatencyMs": 1124,
+      "repoAwareCaught": false,
+      "repoAwareCostUsd": 0.0001971,
+      "repoAwareLatencyMs": 22105,
+      "divergenceNote": null
+    },
+    {
+      "id": "encode/httpx#2539:revert:2523",
+      "repo": "encode/httpx",
+      "method": "revert",
+      "confidence": "high",
+      "diffOnlyCaught": false,
+      "diffOnlyCostUsd": 0.00049995,
+      "diffOnlyLatencyMs": 2064,
+      "repoAwareCaught": false,
+      "repoAwareCostUsd": 0.00120045,
+      "repoAwareLatencyMs": 10525,
+      "divergenceNote": null
+    },
+    {
+      "id": "psf/requests#3738:revert:3713",
+      "repo": "psf/requests",
+      "method": "revert",
+      "confidence": "high",
+      "diffOnlyCaught": true,
+      "diffOnlyCostUsd": 0.00084405,
+      "diffOnlyLatencyMs": 15519,
+      "repoAwareCaught": true,
+      "repoAwareCostUsd": 0.0016565999999999998,
+      "repoAwareLatencyMs": 5601,
+      "divergenceNote": null
+    },
+    {
+      "id": "python-poetry/poetry#3943:revert:3927",
+      "repo": "python-poetry/poetry",
+      "method": "revert",
+      "confidence": "high",
+      "diffOnlyCaught": false,
+      "diffOnlyCostUsd": 0.00023385,
+      "diffOnlyLatencyMs": 10426,
+      "repoAwareCaught": true,
+      "repoAwareCostUsd": 0.00099585,
+      "repoAwareLatencyMs": 14667,
+      "divergenceNote": "**python-poetry/poetry#3943:revert:3927**: repo-aware caught it, diff-only didn't. Retrieval surfaced 11 relevant item(s) - plausibly what tipped the finding."
+    },
+    {
+      "id": "sveltejs/svelte#13131:revert:13082",
+      "repo": "sveltejs/svelte",
+      "method": "revert",
+      "confidence": "high",
+      "diffOnlyCaught": true,
+      "diffOnlyCostUsd": 0.0008925,
+      "diffOnlyLatencyMs": 15769,
+      "repoAwareCaught": true,
+      "repoAwareCostUsd": 0.0017205,
+      "repoAwareLatencyMs": 48980,
+      "divergenceNote": null
+    },
+    {
+      "id": "sveltejs/svelte#12931:revert:12921",
+      "repo": "sveltejs/svelte",
+      "method": "revert",
+      "confidence": "high",
+      "diffOnlyCaught": false,
+      "diffOnlyCostUsd": 0.0005637,
+      "diffOnlyLatencyMs": 16592,
+      "repoAwareCaught": false,
+      "repoAwareCostUsd": 0.00109455,
+      "repoAwareLatencyMs": 7550,
+      "divergenceNote": null
+    },
+    {
+      "id": "sveltejs/svelte#11568:revert:11562",
+      "repo": "sveltejs/svelte",
+      "method": "revert",
+      "confidence": "high",
+      "diffOnlyCaught": false,
+      "diffOnlyCostUsd": 0.00041220000000000004,
+      "diffOnlyLatencyMs": 2647,
+      "repoAwareCaught": false,
+      "repoAwareCostUsd": 0.0007407,
+      "repoAwareLatencyMs": 27127,
+      "divergenceNote": null
+    }
+  ]
+}

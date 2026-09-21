@@ -72,6 +72,10 @@ const EnvSchema = z
     // missing_test findings are noisy in diff-only mode (no repo-wide test
     // visibility to confirm coverage actually exists) - off by default.
     REPORT_MISSING_TESTS: booleanFlag(false),
+    // Off by default: repo-aware mode clones/indexes the repo and costs more
+    // per review than diff-only. Flip on once the indexer's runtime deps
+    // (git, tree-sitter native bindings) are confirmed on the worker's host.
+    ENABLE_REPO_AWARE: booleanFlag(false),
   })
   .refine((env) => Boolean(env.GITHUB_PRIVATE_KEY_PATH || env.GITHUB_PRIVATE_KEY), {
     message: "One of GITHUB_PRIVATE_KEY_PATH or GITHUB_PRIVATE_KEY must be set",

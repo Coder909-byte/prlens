@@ -89,6 +89,11 @@ async function attemptProvider(
         prompt: promptText,
         maxRetries: config.LLM_MAX_RETRIES,
         abortSignal,
+        // Findings should be a deterministic function of the same prompt,
+        // not a coin flip - see the eval methodology's repeated-run design
+        // (README) for why this still isn't enough on its own: some
+        // providers remain non-deterministic even at temperature 0.
+        temperature: 0,
       });
       usage.inputTokens += result.usage.inputTokens ?? 0;
       usage.outputTokens += result.usage.outputTokens ?? 0;

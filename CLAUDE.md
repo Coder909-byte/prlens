@@ -48,7 +48,11 @@ evals/
 
 ## Review pipeline (worker)
 1. Fetch PR diff and changed files
-2. Ensure repo index exists at base SHA (incremental re-index on changed files)
+2. Ensure repo index exists at head SHA (incremental re-index on changed files) - not base:
+   a symbol (and everything it calls) can be introduced in the PR under review itself, which
+   wouldn't exist in a base-SHA index at all; head SHA still finds every pre-existing
+   caller/callee base SHA was originally meant to find, since those survive unless the PR
+   deletes them
 3. For each changed hunk: retrieve context — definitions of called symbols, callers of changed
    symbols, related test files, similar code via embeddings
 4. Review call (strong model) returns structured JSON findings:

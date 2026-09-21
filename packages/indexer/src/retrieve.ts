@@ -20,7 +20,7 @@ export interface RetrievedItem {
 
 export interface RetrievedContext {
   hunk: Hunk;
-  /** The symbol the hunk falls inside, if the indexer found one at base SHA - null for a hunk that's entirely new code (e.g. a brand-new function). */
+  /** The symbol the hunk falls inside, if the indexer found one in `index` - null if nothing in the indexed sha overlaps the hunk's range. */
   changedSymbol: { name: string; kind: string } | null;
   items: RetrievedItem[];
   /** True if the token budget was hit before every candidate could be included - always reported, since it's exactly what tells you retrieval, not the model, is why some context is missing. */

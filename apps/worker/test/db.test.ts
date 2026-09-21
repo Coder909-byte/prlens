@@ -25,7 +25,7 @@ vi.mock("@prlens/db", async () => {
 });
 
 const { recordReview } = await import("../src/db.js");
-const { ReviewStatus } = await import("@prlens/db");
+const { ReviewStatus, ReviewMode } = await import("@prlens/db");
 
 describe("recordReview", () => {
   beforeEach(() => {
@@ -43,6 +43,7 @@ describe("recordReview", () => {
         headSha: "abc123",
         baseSha: "def456",
       },
+      mode: ReviewMode.DIFF_ONLY,
       status: ReviewStatus.SUCCEEDED,
       primaryProvider: "groq",
       primaryModel: "openai/gpt-oss-120b",
@@ -54,6 +55,7 @@ describe("recordReview", () => {
       latencyMs: 500,
       skipped: [],
       findings: [],
+      retrievedContext: [],
       inlineComments: [],
       githubReviewId: REALISTIC_LARGE_ID,
     });
@@ -72,6 +74,7 @@ describe("recordReview", () => {
   it("stores a null githubReviewId as null, not BigInt(null)", async () => {
     await recordReview({
       job: { installationId: 123, owner: "acme", repo: "widgets", pullNumber: 1, headSha: "x", baseSha: "y" },
+      mode: ReviewMode.DIFF_ONLY,
       status: ReviewStatus.FAILED,
       primaryProvider: "groq",
       primaryModel: "m",
@@ -83,6 +86,7 @@ describe("recordReview", () => {
       latencyMs: 10,
       skipped: [],
       findings: [],
+      retrievedContext: [],
       inlineComments: [],
       githubReviewId: null,
     });

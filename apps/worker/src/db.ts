@@ -1,5 +1,6 @@
-import { prisma, FindingSeverity, FindingCategory, ReviewStatus, type Prisma } from "@prlens/db";
+import { prisma, FindingSeverity, FindingCategory, ReviewStatus, ReviewMode, Prisma } from "@prlens/db";
 import type { Finding, InlineComment, SkippedFile } from "@prlens/reviewer";
+import type { RetrievedItem } from "@prlens/indexer";
 import type { ReviewJobData } from "@prlens/shared";
 
 const SEVERITY_MAP: Record<Finding["severity"], FindingSeverity> = {
@@ -18,6 +19,7 @@ const CATEGORY_MAP: Record<Finding["category"], FindingCategory> = {
 
 export interface RecordReviewInput {
   job: ReviewJobData;
+  mode: ReviewMode;
   status: ReviewStatus;
   primaryProvider: string;
   primaryModel: string;
@@ -29,6 +31,8 @@ export interface RecordReviewInput {
   latencyMs: number;
   skipped: SkippedFile[];
   findings: Finding[];
+  /** Same length/order as `findings` - the retrieved-context items for the hunk each finding falls in, or null when nothing matched (always null in diff-only mode). */
+  retrievedContext: (RetrievedItem[] | null)[];
   inlineComments: InlineComment[];
   errorMessage?: string;
   githubReviewId: number | null;
@@ -42,6 +46,7 @@ export async function recordReview(input: RecordReviewInput): Promise<void> {
   const { job } = input;
 
   const scalarData = {
+    mode: input.mode,
     status: input.status,
     primaryLlmProvider: input.primaryProvider,
     primaryLlmModel: input.primaryModel,
@@ -81,7 +86,7 @@ export async function recordReview(input: RecordReviewInput): Promise<void> {
       baseSha: job.baseSha,
       ...scalarData,
       findings: {
-        create: input.findings.map((f) => ({
+        create: input.findings.map((f, i) => ({
           file: f.file,
           line: f.line,
           severity: SEVERITY_MAP[f.severity],
@@ -90,6 +95,9 @@ export async function recordReview(input: RecordReviewInput): Promise<void> {
           suggestedFix: f.suggested_fix,
           confidence: f.confidence,
           postedInline: wasPostedInline(f, input.inlineComments),
+          retrievedContext: input.retrievedContext[i]
+            ? (input.retrievedContext[i] as unknown as Prisma.InputJsonValue)
+            : Prisma.JsonNull,
         })),
       },
     },

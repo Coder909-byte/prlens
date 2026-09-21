@@ -1,18 +1,35 @@
 import type { Job } from "pg-boss";
 import { config, logger, computeCostUsd, type ReviewJobData } from "@prlens/shared";
-import { ReviewStatus } from "@prlens/db";
+import { ReviewStatus, ReviewMode } from "@prlens/db";
 import {
   filterDiffFiles,
   parseDiffHunks,
   runDiffOnlyReview,
+  runRepoAwareReview,
+  extractHunks,
   formatReview,
   resolveLanguageModel,
+  type Finding,
   type PrFile,
   type ReviewOutcome,
 } from "@prlens/reviewer";
+import { ensureIndex, retrieveContext, type RetrievedContext, type RetrievedItem } from "@prlens/indexer";
 import { getInstallationOctokit } from "./github.js";
 import { recordReview } from "./db.js";
 import { supersedePreviousReview } from "./supersede.js";
+
+// Same default the eval runner (evals/runner/src/index.ts) uses for
+// --context-tokens - keeps production and eval retrieval sized the same way
+// absent a reason to diverge.
+const CONTEXT_TOKENS_PER_HUNK = 2000;
+
+/** The retrieved context whose hunk contains `finding.line` in `finding.file`, if any - a finding can only be matched back to context found in the same file/hunk it was raised in. */
+function contextForFinding(finding: Finding, contexts: RetrievedContext[]): RetrievedItem[] | null {
+  const match = contexts.find(
+    (c) => c.hunk.file === finding.file && finding.line >= c.hunk.startLine && finding.line <= c.hunk.endLine,
+  );
+  return match && match.items.length > 0 ? match.items : null;
+}
 
 export async function processReviewJob(job: Job<ReviewJobData>): Promise<void> {
   const startedAt = Date.now();
@@ -32,7 +49,10 @@ export async function processReviewJob(job: Job<ReviewJobData>): Promise<void> {
 
   const diffLineMap = new Map(included.map((f) => [f.filename, parseDiffHunks(f.patch)]));
 
+  const mode = config.ENABLE_REPO_AWARE ? ReviewMode.REPO_AWARE : ReviewMode.DIFF_ONLY;
+
   let outcome: ReviewOutcome;
+  let retrievedContexts: RetrievedContext[] = [];
   if (included.length === 0) {
     // Nothing reviewable - skip the LLM call entirely, but still resolve
     // provider/model so the DB record is consistent with a normal review.
@@ -46,6 +66,20 @@ export async function processReviewJob(job: Job<ReviewJobData>): Promise<void> {
       model: modelId,
       failed: false,
     };
+  } else if (mode === ReviewMode.REPO_AWARE) {
+    // Head, not base: a symbol (and everything it calls) can be introduced
+    // in this same PR, in which case it doesn't exist at base sha at all -
+    // smallestOverlapping (packages/indexer/src/retrieve.ts) would then
+    // silently resolve the hunk's changedSymbol to an unrelated pre-existing
+    // symbol that happens to share the file, instead of finding nothing (or
+    // finding a genuinely relevant same-PR caller/callee elsewhere in the
+    // repo). Head sha is a strict superset of base for this purpose - every
+    // pre-existing caller/callee this was designed to find is still present
+    // post-PR unless the PR itself deletes it.
+    const index = await ensureIndex(data.owner, data.repo, data.headSha);
+    const hunks = extractHunks(included);
+    retrievedContexts = hunks.map((hunk) => retrieveContext(index, hunk, CONTEXT_TOKENS_PER_HUNK));
+    outcome = await runRepoAwareReview(included, skipped, retrievedContexts);
   } else {
     outcome = await runDiffOnlyReview(included, skipped);
   }
@@ -86,6 +120,7 @@ export async function processReviewJob(job: Job<ReviewJobData>): Promise<void> {
   try {
     await recordReview({
       job: data,
+      mode,
       status: outcome.failed ? ReviewStatus.FAILED : ReviewStatus.SUCCEEDED,
       primaryProvider: outcome.primaryProvider,
       primaryModel: outcome.primaryModel,
@@ -97,6 +132,7 @@ export async function processReviewJob(job: Job<ReviewJobData>): Promise<void> {
       latencyMs,
       skipped,
       findings: outcome.findings,
+      retrievedContext: outcome.findings.map((f) => contextForFinding(f, retrievedContexts)),
       inlineComments,
       errorMessage: outcome.failed ? "LLM did not return a schema-valid findings object after retrying" : undefined,
       githubReviewId,
