@@ -5,6 +5,7 @@ node_modules/
 *.pem
 dist/
 build/
+out/
 .turbo/
 *.log
 .DS_Store

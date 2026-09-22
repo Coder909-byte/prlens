@@ -1,0 +1,48 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: #0e1115;
+  color: #e6e9ee;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: #7fdcb5;
+  text-decoration: none;
+}
+a:hover {
+  color: #b3f0d4;
+}
+
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-left: clamp(20px, 5vw, 0px);
+  padding-right: clamp(20px, 5vw, 0px);
+}
+
+/* Desktop matches the source design's 1440px artboard (160px side padding,
+   1120px content). Narrower viewports reflow to single columns instead of
+   trying to preserve the fixed-width mockup literally. */
+@media (max-width: 900px) {
+  .stack-below-900 {
+    flex-direction: column !important;
+  }
+  .hero-side {
+    width: 100% !important;
+  }
+  .matrix-side {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .hide-below-640 {
+    display: none !important;
+  }
+}
