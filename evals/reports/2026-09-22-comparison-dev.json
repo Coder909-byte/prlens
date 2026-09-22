@@ -1,0 +1,390 @@
+{
+  "generatedAt": "2026-09-22T18:36:52.160Z",
+  "split": "dev",
+  "provider": "groq",
+  "model": "default",
+  "splitNote": "Dataset too small (11 accepted pairs) to hold out a test split - all accepted pairs are assigned to \"dev\" and used as the single evaluation set. No \"test\" split exists yet; --split test in the runner is reserved for when the dataset grows.",
+  "overall": {
+    "diffOnly": {
+      "pairCount": 11,
+      "recall": 0.32727272727272727,
+      "fpPerPr": 0,
+      "avgCostUsd": 0.0005115611111111113,
+      "totalCostUsd": 0.027624300000000008,
+      "p50LatencyMs": 2525,
+      "p95LatencyMs": 14461,
+      "failedCount": 1
+    },
+    "repoAware": {
+      "pairCount": 11,
+      "recall": 0.3818181818181818,
+      "fpPerPr": 0,
+      "avgCostUsd": 0.0008148704081632652,
+      "totalCostUsd": 0.039928649999999996,
+      "p50LatencyMs": 3307,
+      "p95LatencyMs": 136046,
+      "failedCount": 6
+    },
+    "extraInputTokensAvg": 1282.0545454545456,
+    "extraCostUsd": 0.012304349999999988
+  },
+  "byRepo": {
+    "axios/axios": {
+      "diffOnly": {
+        "pairCount": 4,
+        "recall": 0.25,
+        "fpPerPr": 0,
+        "avgCostUsd": 0.00043803,
+        "totalCostUsd": 0.0087606,
+        "p50LatencyMs": 1770,
+        "p95LatencyMs": 3258,
+        "failedCount": 0
+      },
+      "repoAware": {
+        "pairCount": 4,
+        "recall": 0.35,
+        "fpPerPr": 0,
+        "avgCostUsd": 0.0006226275,
+        "totalCostUsd": 0.01245255,
+        "p50LatencyMs": 2275,
+        "p95LatencyMs": 3590,
+        "failedCount": 0
+      }
+    },
+    "date-fns/date-fns": {
+      "diffOnly": {
+        "pairCount": 1,
+        "recall": 0,
+        "fpPerPr": 0,
+        "avgCostUsd": 0.00017835,
+        "totalCostUsd": 0.00089175,
+        "p50LatencyMs": 1127,
+        "p95LatencyMs": 1290,
+        "failedCount": 0
+      },
+      "repoAware": {
+        "pairCount": 1,
+        "recall": 0,
+        "fpPerPr": 0,
+        "avgCostUsd": 0.00019709999999999997,
+        "totalCostUsd": 0.0009854999999999998,
+        "p50LatencyMs": 1436,
+        "p95LatencyMs": 1985,
+        "failedCount": 0
+      }
+    },
+    "encode/httpx": {
+      "diffOnly": {
+        "pairCount": 1,
+        "recall": 0,
+        "fpPerPr": 0,
+        "avgCostUsd": 0.00047463000000000003,
+        "totalCostUsd": 0.00237315,
+        "p50LatencyMs": 2551,
+        "p95LatencyMs": 2896,
+        "failedCount": 0
+      },
+      "repoAware": {
+        "pairCount": 1,
+        "recall": 0.2,
+        "fpPerPr": 0,
+        "avgCostUsd": 0.00103437,
+        "totalCostUsd": 0.0051718499999999995,
+        "p50LatencyMs": 4906,
+        "p95LatencyMs": 30606,
+        "failedCount": 0
+      }
+    },
+    "psf/requests": {
+      "diffOnly": {
+        "pairCount": 1,
+        "recall": 0.6,
+        "fpPerPr": 0,
+        "avgCostUsd": 0.0009141299999999998,
+        "totalCostUsd": 0.004570649999999999,
+        "p50LatencyMs": 6449,
+        "p95LatencyMs": 83140,
+        "failedCount": 0
+      },
+      "repoAware": {
+        "pairCount": 1,
+        "recall": 0.6,
+        "fpPerPr": 0,
+        "avgCostUsd": 0.00158376,
+        "totalCostUsd": 0.0079188,
+        "p50LatencyMs": 94405,
+        "p95LatencyMs": 102264,
+        "failedCount": 0
+      }
+    },
+    "python-poetry/poetry": {
+      "diffOnly": {
+        "pairCount": 1,
+        "recall": 0,
+        "fpPerPr": 0,
+        "avgCostUsd": 0.00024741,
+        "totalCostUsd": 0.00123705,
+        "p50LatencyMs": 4732,
+        "p95LatencyMs": 14461,
+        "failedCount": 0
+      },
+      "repoAware": {
+        "pairCount": 1,
+        "recall": 0.4,
+        "fpPerPr": 0,
+        "avgCostUsd": 0.00074421,
+        "totalCostUsd": 0.00372105,
+        "p50LatencyMs": 5603,
+        "p95LatencyMs": 14551,
+        "failedCount": 0
+      }
+    },
+    "sveltejs/svelte": {
+      "diffOnly": {
+        "pairCount": 3,
+        "recall": 0.6666666666666666,
+        "fpPerPr": 0,
+        "avgCostUsd": 0.0006993642857142856,
+        "totalCostUsd": 0.009791099999999999,
+        "p50LatencyMs": 2565,
+        "p95LatencyMs": 3384845,
+        "failedCount": 1
+      },
+      "repoAware": {
+        "pairCount": 3,
+        "recall": 0.5333333333333333,
+        "fpPerPr": 0,
+        "avgCostUsd": 0.0010754333333333331,
+        "totalCostUsd": 0.009678899999999999,
+        "p50LatencyMs": 46481,
+        "p95LatencyMs": 138877,
+        "failedCount": 6
+      }
+    }
+  },
+  "repeated": {
+    "runsPerPair": 5,
+    "diffOnly": {
+      "recallPerRun": [
+        0.36363636363636365,
+        0.2727272727272727,
+        0.36363636363636365,
+        0.36363636363636365,
+        0.2727272727272727
+      ],
+      "recallMean": 0.32727272727272727,
+      "recallMin": 0.2727272727272727,
+      "recallMax": 0.36363636363636365
+    },
+    "repoAware": {
+      "recallPerRun": [
+        0.45454545454545453,
+        0.36363636363636365,
+        0.5454545454545454,
+        0.36363636363636365,
+        0.18181818181818182
+      ],
+      "recallMean": 0.3818181818181818,
+      "recallMin": 0.18181818181818182,
+      "recallMax": 0.5454545454545454
+    },
+    "rangesOverlap": true,
+    "confusionMatrix": {
+      "both": 15,
+      "diffOnly": 3,
+      "repoAwareOnly": 6,
+      "neither": 31,
+      "totalComparisons": 55
+    },
+    "retrievalQuietModelNote": null
+  },
+  "pairs": [
+    {
+      "id": "axios/axios#4699:revert:4550",
+      "repo": "axios/axios",
+      "method": "revert",
+      "confidence": "high",
+      "diffOnlyCaught": false,
+      "diffOnlyCatchCount": 0,
+      "diffOnlyRuns": 5,
+      "diffOnlyCostUsd": 0.0003162,
+      "diffOnlyLatencyMs": 1409,
+      "repoAwareCaught": false,
+      "repoAwareCatchCount": 0,
+      "repoAwareRuns": 5,
+      "repoAwareCostUsd": 0.00063957,
+      "repoAwareLatencyMs": 2202,
+      "divergenceNote": null
+    },
+    {
+      "id": "axios/axios#3289:revert:1773",
+      "repo": "axios/axios",
+      "method": "revert",
+      "confidence": "high",
+      "diffOnlyCaught": false,
+      "diffOnlyCatchCount": 0,
+      "diffOnlyRuns": 5,
+      "diffOnlyCostUsd": 0.00024278999999999997,
+      "diffOnlyLatencyMs": 1279,
+      "repoAwareCaught": false,
+      "repoAwareCatchCount": 1,
+      "repoAwareRuns": 5,
+      "repoAwareCostUsd": 0.00053205,
+      "repoAwareLatencyMs": 2029,
+      "divergenceNote": null
+    },
+    {
+      "id": "axios/axios#2982:revert:1511",
+      "repo": "axios/axios",
+      "method": "revert",
+      "confidence": "high",
+      "diffOnlyCaught": true,
+      "diffOnlyCatchCount": 5,
+      "diffOnlyRuns": 5,
+      "diffOnlyCostUsd": 0.00070458,
+      "diffOnlyLatencyMs": 3038,
+      "repoAwareCaught": true,
+      "repoAwareCatchCount": 5,
+      "repoAwareRuns": 5,
+      "repoAwareCostUsd": 0.0006580500000000001,
+      "repoAwareLatencyMs": 3508,
+      "divergenceNote": null
+    },
+    {
+      "id": "axios/axios#2977:revert:1258",
+      "repo": "axios/axios",
+      "method": "revert",
+      "confidence": "high",
+      "diffOnlyCaught": false,
+      "diffOnlyCatchCount": 0,
+      "diffOnlyRuns": 5,
+      "diffOnlyCostUsd": 0.00048855,
+      "diffOnlyLatencyMs": 2594,
+      "repoAwareCaught": false,
+      "repoAwareCatchCount": 1,
+      "repoAwareRuns": 5,
+      "repoAwareCostUsd": 0.0006608399999999999,
+      "repoAwareLatencyMs": 2490,
+      "divergenceNote": null
+    },
+    {
+      "id": "date-fns/date-fns#1256:revert:1233",
+      "repo": "date-fns/date-fns",
+      "method": "revert",
+      "confidence": "high",
+      "diffOnlyCaught": false,
+      "diffOnlyCatchCount": 0,
+      "diffOnlyRuns": 5,
+      "diffOnlyCostUsd": 0.00017835,
+      "diffOnlyLatencyMs": 1147,
+      "repoAwareCaught": false,
+      "repoAwareCatchCount": 0,
+      "repoAwareRuns": 5,
+      "repoAwareCostUsd": 0.00019709999999999997,
+      "repoAwareLatencyMs": 1362,
+      "divergenceNote": null
+    },
+    {
+      "id": "encode/httpx#2539:revert:2523",
+      "repo": "encode/httpx",
+      "method": "revert",
+      "confidence": "high",
+      "diffOnlyCaught": false,
+      "diffOnlyCatchCount": 0,
+      "diffOnlyRuns": 5,
+      "diffOnlyCostUsd": 0.00047463000000000003,
+      "diffOnlyLatencyMs": 2560,
+      "repoAwareCaught": false,
+      "repoAwareCatchCount": 1,
+      "repoAwareRuns": 5,
+      "repoAwareCostUsd": 0.00103437,
+      "repoAwareLatencyMs": 11807,
+      "divergenceNote": null
+    },
+    {
+      "id": "psf/requests#3738:revert:3713",
+      "repo": "psf/requests",
+      "method": "revert",
+      "confidence": "high",
+      "diffOnlyCaught": true,
+      "diffOnlyCatchCount": 3,
+      "diffOnlyRuns": 5,
+      "diffOnlyCostUsd": 0.0009141299999999998,
+      "diffOnlyLatencyMs": 20959,
+      "repoAwareCaught": true,
+      "repoAwareCatchCount": 3,
+      "repoAwareRuns": 5,
+      "repoAwareCostUsd": 0.00158376,
+      "repoAwareLatencyMs": 66963,
+      "divergenceNote": null
+    },
+    {
+      "id": "python-poetry/poetry#3943:revert:3927",
+      "repo": "python-poetry/poetry",
+      "method": "revert",
+      "confidence": "high",
+      "diffOnlyCaught": false,
+      "diffOnlyCatchCount": 0,
+      "diffOnlyRuns": 5,
+      "diffOnlyCostUsd": 0.00024741,
+      "diffOnlyLatencyMs": 6153,
+      "repoAwareCaught": false,
+      "repoAwareCatchCount": 2,
+      "repoAwareRuns": 5,
+      "repoAwareCostUsd": 0.00074421,
+      "repoAwareLatencyMs": 7653,
+      "divergenceNote": null
+    },
+    {
+      "id": "sveltejs/svelte#13131:revert:13082",
+      "repo": "sveltejs/svelte",
+      "method": "revert",
+      "confidence": "high",
+      "diffOnlyCaught": true,
+      "diffOnlyCatchCount": 5,
+      "diffOnlyRuns": 5,
+      "diffOnlyCostUsd": 0.00088842,
+      "diffOnlyLatencyMs": 4971,
+      "repoAwareCaught": true,
+      "repoAwareCatchCount": 4,
+      "repoAwareRuns": 5,
+      "repoAwareCostUsd": 0.0012565200000000001,
+      "repoAwareLatencyMs": 58195,
+      "divergenceNote": null
+    },
+    {
+      "id": "sveltejs/svelte#12931:revert:12921",
+      "repo": "sveltejs/svelte",
+      "method": "revert",
+      "confidence": "high",
+      "diffOnlyCaught": false,
+      "diffOnlyCatchCount": 0,
+      "diffOnlyRuns": 5,
+      "diffOnlyCostUsd": 0.00048588,
+      "diffOnlyLatencyMs": 678750,
+      "repoAwareCaught": false,
+      "repoAwareCatchCount": 0,
+      "repoAwareRuns": 5,
+      "repoAwareCostUsd": 0,
+      "repoAwareLatencyMs": 136221,
+      "divergenceNote": null
+    },
+    {
+      "id": "sveltejs/svelte#11568:revert:11562",
+      "repo": "sveltejs/svelte",
+      "method": "revert",
+      "confidence": "high",
+      "diffOnlyCaught": true,
+      "diffOnlyCatchCount": 5,
+      "diffOnlyRuns": 5,
+      "diffOnlyCostUsd": 0.00058392,
+      "diffOnlyLatencyMs": 2222,
+      "repoAwareCaught": true,
+      "repoAwareCatchCount": 4,
+      "repoAwareRuns": 5,
+      "repoAwareCostUsd": 0.00067926,
+      "repoAwareLatencyMs": 2598,
+      "divergenceNote": null
+    }
+  ]
+}

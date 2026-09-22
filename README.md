@@ -50,27 +50,51 @@ That blame-trace was tested against 20 real SWE-bench Verified instances (5 each
 
 ## Results (n=11 — read every number with that in mind)
 
-Both modes run against the same 11 accepted pairs, groq/`openai/gpt-oss-120b`, no fallback provider, single prompt version each.
+A single run of each mode showed a large recall swing between two otherwise-identical comparisons (repo-aware moved from 36.4% to 54.5% with *zero* code changes, just a re-run) — traced to LLM output non-determinism, not a real effect. `temperature: 0` is now pinned on every review call, and the swing still happens: some providers just aren't fully deterministic even at temperature 0. A single run per mode cannot support a diff-only vs. repo-aware comparison at n=11, so this reports **5 independent runs per pair per mode** (110 calls total, groq/`openai/gpt-oss-120b`, no fallback provider) instead of one.
 
-| Mode | Recall | FP/PR | Avg cost/review | p50 latency | p95 latency |
+| Mode | Mean recall | Range (5 runs) | FP/PR | Avg cost/review | Failed calls |
 |---|---|---|---|---|---|
-| diff-only | 36.4% (4/11) | 0.00 | $0.00052 | 2,677ms | 16,592ms |
-| repo-aware | 36.4% (4/11) | 0.00 | $0.00079 | 11,440ms | 38,938ms |
+| diff-only | 32.7% | 27.3% – 36.4% | 0.00 | $0.00051 | 1/55 |
+| repo-aware | 38.2% | 18.2% – 54.5% | 0.00 | $0.00081 | 6/55 |
 
-Repo-aware context costs about **1,416 extra input tokens per review** (+$0.00296 total across 11 pairs) and roughly 4x the latency, for the *same* aggregate recall on this sample — but not the same bugs.
+**The ranges overlap.** At n=11, diff-only and repo-aware are not distinguishable on this sample — the ~5.5-point mean difference is within run-to-run model noise, not a measured effect of repo-aware context. Repo-aware's range is also visibly wider (18.2–54.5%, more than 2x diff-only's 27.3–36.4% spread), which is itself informative: the extra context doesn't just fail to move the mean, it makes the model's output less consistent run to run.
 
-### The finding worth reporting: retrieval worked, the model didn't act on it
+Repo-aware also failed outright more often — 6 of 55 calls gave up after exhausting retries, vs. 1 of 55 for diff-only, mostly groq rate-limiting on the larger repo-aware prompts (~1,282 extra input tokens/review on average, +$0.0123 total across all 55 repo-aware calls). On this sample, repo-aware's real-world reliability is currently worse, not just its recall being a wash.
 
-Both modes caught 4 of 11 pairs, but not the *same* 4 — 2 pairs diverged, and the retrieved context was logged per hunk specifically to distinguish why:
+### Per-pair catch rate (out of 5 runs)
 
-- **`psf/requests#3738`** (introducing PR #3713, "Restrict URL preparation to HTTP/HTTPS," ground truth `requests/models.py:350-352`): diff-only caught it — a real finding at line 352, confidence 0.94, correctly identifying that the new scheme check breaks on non-HTTP(S) URLs. Repo-aware **missed it**. Checking the logged context directly: retrieval surfaced 18 relevant items across the 2 changed hunks — the exact callees, callers, and even the relevant test file. The model was given the right context and returned zero findings anyway.
-- **`python-poetry/poetry#3943`**: the reverse — diff-only found nothing, repo-aware caught it, with 11 retrieved items that plausibly supplied the missing signal.
+| Pair | diff-only | repo-aware |
+|---|---|---|
+| `axios/axios#2982:revert:1511` | 5/5 | 5/5 |
+| `sveltejs/svelte#13131:revert:13082` | 5/5 | 4/5 |
+| `sveltejs/svelte#11568:revert:11562` | 5/5 | 4/5 |
+| `psf/requests#3738:revert:3713` | 3/5 | 3/5 |
+| `python-poetry/poetry#3943:revert:3927` | 0/5 | 2/5 |
+| `encode/httpx#2539:revert:2523` | 0/5 | 1/5 |
+| `axios/axios#2977:revert:1258` | 0/5 | 1/5 |
+| `axios/axios#3289:revert:1773` | 0/5 | 1/5 |
+| `axios/axios#4699:revert:4550` | 0/5 | 0/5 |
+| `date-fns/date-fns#1256:revert:1233` | 0/5 | 0/5 |
+| `sveltejs/svelte#12931:revert:12921` | 0/5 | 0/5 |
 
-On this sample, when repo-aware underperforms, the bottleneck is the model's judgment given more context, not the indexer or retrieval failing to find the right code. That's a specific, falsifiable claim about *this* small model on *this* small sample, not a general conclusion about repo-aware review.
+Only 3 of 11 pairs are caught reliably (≥4/5) by either mode. Everything else is either never caught in 5 tries or caught inconsistently — the same PR, same ground truth, same prompt, a different answer depending on the run.
+
+### Confusion matrix, recomputed from all 55 pair×run comparisons (not 11 pairs)
+
+| | repo-aware ✓ | repo-aware ✗ |
+|---|---|---|
+| **diff-only ✓** | 15 | 3 |
+| **diff-only ✗** | 6 | 31 |
+
+Repo-aware catches something diff-only doesn't in 6 of 55 comparisons; diff-only catches something repo-aware doesn't in 3. Neither mode catches anything in 31 of 55 (56%) — most of the sample, most of the time, both modes miss the bug.
+
+### A claim retracted: "retrieval worked, the model didn't act on it" doesn't hold up
+
+The single-run comparison reported a specific finding: `psf/requests#3738` was caught by diff-only, missed by repo-aware despite retrieval surfacing 18 relevant items — read as "the model seeing the right context and staying quiet." Repeated 5x, repo-aware actually caught this pair 3 of 5 times — the *same* rate as diff-only (3/5). The single run that produced the original claim was one sample from a pair both modes handle inconsistently, not a stable pattern about repo-aware specifically. **Retracted** — kept here as a record of why a single-run finding didn't survive replication, not restated as a result.
 
 ## Limitations
 
-**n=11.** This is the first fact about every number above. A single pair swings a repo's reported recall between 0% and 100% (see the per-repo breakdown in `evals/reports/2026-09-20-comparison-dev.md`) — repo-level numbers are not yet meaningful on their own.
+**n=11.** This is the first fact about every number above. A single pair swings recall by ~9 points, and the repeated-run ranges above overlap between modes — repo-level numbers, and the diff-only/repo-aware comparison itself, are not yet meaningful on their own.
 
 - **Every accepted pair is revert-tier.** The issue-link identification path (PR-title heuristics, blame-tracing, text-based line remapping) — the majority of the miner's engineering — contributed candidates, but none survived to acceptance. The 11-pair benchmark currently only tests "would repo-aware catch a bug exact enough that its own team reverted it," which is a narrower and probably easier case than the general "fixes #N" bug.
 - **No dev/test split.** 11 accepted pairs isn't enough to hold one out meaningfully (a test split infrastructure exists in the runner and is deliberately unused). Any future prompt or retrieval tuning against this same 11 risks overfitting to it, with no held-out check.
