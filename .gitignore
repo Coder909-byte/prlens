@@ -26,3 +26,4 @@ evals/runner/.cache/
 # indexer: checked-out repo clones and the symbol/call-graph cache are both derived/regenerable.
 packages/indexer/.repos/
 packages/indexer/.cache/
+.next/
