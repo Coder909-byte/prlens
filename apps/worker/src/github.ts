@@ -2,9 +2,10 @@ import { readFileSync } from "node:fs";
 import { App } from "@octokit/app";
 import { Octokit } from "octokit";
 import { config } from "@prlens/shared";
+import { normalizePemKey } from "./pem.js";
 
 function loadPrivateKey(): string {
-  if (config.GITHUB_PRIVATE_KEY) return config.GITHUB_PRIVATE_KEY;
+  if (config.GITHUB_PRIVATE_KEY) return normalizePemKey(config.GITHUB_PRIVATE_KEY);
   // GITHUB_PRIVATE_KEY_PATH's presence is enforced by config.ts's refine().
   return readFileSync(config.GITHUB_PRIVATE_KEY_PATH!, "utf8");
 }

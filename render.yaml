@@ -7,12 +7,23 @@ services:
     # No rootDir - stays at the repo root, same reasoning as any pnpm
     # workspace: pnpm needs the root lockfile to resolve installs, and every
     # command below targets one workspace package explicitly via --filter.
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter @prlens/db exec prisma generate
+    # NODE_ENV=development for install only: pnpm (like npm) silently skips
+    # devDependencies when NODE_ENV=production is set, and tsx/typescript
+    # here are devDependencies needed to actually RUN the app (this repo has
+    # no compile step - every app runs tsx directly against .ts source, in
+    # prod same as local dev). Render sets NODE_ENV=production for the
+    # running service; whether that also applies during the build step isn't
+    # documented, so this doesn't rely on it either way.
+    # `migrate deploy` applies any pending migrations against DIRECT_URL (a
+    # no-op today - the Neon DB this points at is already up to date - but
+    # without it, a future schema change would need someone to remember to
+    # run it by hand before/after every deploy).
+    buildCommand: corepack enable && NODE_ENV=development pnpm install --frozen-lockfile && pnpm --filter @prlens/db exec prisma generate && pnpm --filter @prlens/db exec prisma migrate deploy
     startCommand: pnpm --filter @prlens/server run start
     healthCheckPath: /health
     envVars:
       - key: NODE_VERSION
-        value: 20
+        value: "24"
       - key: GITHUB_APP_ID
         sync: false
       - key: GITHUB_PRIVATE_KEY
@@ -23,10 +34,24 @@ services:
         sync: false
       - key: DIRECT_URL
         sync: false
+      # Matches the working local .env config: groq primary (Google's free
+      # tier is 20 req/day - too small for a live webhook receiver), google
+      # as fallback if groq returns a retryable error (429/503/timeout).
       - key: LLM_PROVIDER
+        value: groq
+      - key: LLM_FALLBACK_PROVIDERS
         value: google
+      - key: GROQ_API_KEY
+        sync: false
       - key: GOOGLE_GENERATIVE_AI_API_KEY
         sync: false
+      # Explicit, matching local .env, rather than relying on config.ts's
+      # defaults (which happen to be the same values today, but a future
+      # default change would then silently change prod behavior too).
+      - key: LLM_MAX_RETRIES
+        value: "1"
+      - key: LLM_REVIEW_TIMEOUT_SECONDS
+        value: "90"
       - key: ENABLE_REPO_AWARE
         value: "true"
       - key: MAX_DIFF_BYTES
