@@ -1,7 +1,7 @@
 const SANS = "var(--font-geist-sans), system-ui, sans-serif";
 const MONO = "var(--font-geist-mono), ui-monospace, monospace";
 const ACCENT = "#5fd4a6";
-const INSTALL_URL = "https://github.com/apps/prlens-dev-jivesh";
+const INSTALL_URL = "https://github.com/apps/prlenss";
 const REPO_URL = "https://github.com/Coder909-byte/prlens";
 
 export default function LandingPage() {
