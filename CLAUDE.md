@@ -13,7 +13,9 @@ Target resume line: "caught X% of real bugs on a N-PR benchmark at $Y/review; Z 
 ## Stack
 - Language: TypeScript everywhere (Node 20+), pnpm workspaces + Turborepo
 - GitHub: GitHub App via Octokit (`@octokit/app`, `@octokit/webhooks`)
-- Webhook server: Hono (small, fast), deployed on Railway or Fly.io
+- Webhook server: Hono (small, fast). Production: Render's free tier (one web service, so
+  apps/github-app and apps/worker run combined in one process - see apps/server); local dev
+  keeps them as separate processes.
 - Jobs: pg-boss on the existing Neon Postgres (its own `pgboss` schema, connected via
   `DIRECT_URL`) - reviews run longer than a webhook request allows, and this avoids
   running a separate Redis instance
@@ -34,6 +36,7 @@ Target resume line: "caught X% of real bugs on a N-PR benchmark at $Y/review; Z 
 apps/
   github-app/     webhook receiver: verifies signature, enqueues review jobs
   worker/         pulls jobs, runs the review pipeline, posts comments
+  server/         production-only: combines github-app + worker in one process (render.yaml)
   web/            Next.js landing page + install dashboard (later)
 packages/
   db/             Prisma schema, pgvector setup

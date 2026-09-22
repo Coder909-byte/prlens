@@ -1,6 +1,6 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { existsSync, mkdirSync } from "node:fs";
+import { existsSync, mkdirSync, rmSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -31,6 +31,11 @@ async function git(cwd: string, args: string[], attempt = 0): Promise<string> {
 
 function repoDirFor(owner: string, name: string): string {
   return join(REPOS_DIR, `${owner}__${name}`);
+}
+
+/** Deletes a repo's checked-out clone from disk, if present - used to bound disk/memory use in production (apps/worker cleans up after every repo-aware review), not needed for eval/dev runs against a small fixed dataset where reuse across runs is the point. */
+export function removeRepoCheckout(owner: string, name: string): void {
+  rmSync(repoDirFor(owner, name), { recursive: true, force: true });
 }
 
 /** Blobless partial clone (or fetch, if already cloned) + checkout at `sha`, detached. No disk cap here - the indexer only ever touches repos the eval/miner already validated as small enough. */

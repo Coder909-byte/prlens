@@ -55,6 +55,31 @@ importers:
         specifier: ^2.1.0
         version: 2.1.0(@types/node@22.20.3)(lightningcss@1.32.0)
 
+  apps/server:
+    dependencies:
+      '@hono/node-server':
+        specifier: ^1.13.0
+        version: 1.19.17(hono@4.13.8)
+      '@prlens/github-app':
+        specifier: workspace:*
+        version: link:../github-app
+      '@prlens/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
+      '@prlens/worker':
+        specifier: workspace:*
+        version: link:../worker
+    devDependencies:
+      '@types/node':
+        specifier: ^22.10.0
+        version: 22.20.3
+      tsx:
+        specifier: ^4.19.0
+        version: 4.23.13
+      typescript:
+        specifier: ^5.7.0
+        version: 5.7.2
+
   apps/web:
     dependencies:
       '@prlens/db':

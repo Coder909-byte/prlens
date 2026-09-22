@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: prlens-server
+    runtime: node
+    plan: free
+    region: oregon
+    # No rootDir - stays at the repo root, same reasoning as any pnpm
+    # workspace: pnpm needs the root lockfile to resolve installs, and every
+    # command below targets one workspace package explicitly via --filter.
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter @prlens/db exec prisma generate
+    startCommand: pnpm --filter @prlens/server run start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: GITHUB_APP_ID
+        sync: false
+      - key: GITHUB_PRIVATE_KEY
+        sync: false
+      - key: GITHUB_WEBHOOK_SECRET
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: LLM_PROVIDER
+        value: google
+      - key: GOOGLE_GENERATIVE_AI_API_KEY
+        sync: false
+      - key: ENABLE_REPO_AWARE
+        value: "true"
+      - key: MAX_DIFF_BYTES
+        value: "60000"
+      - key: REPORT_MISSING_TESTS
+        value: "false"
+      # Do not set WEBHOOK_PROXY_URL or PORT - see the deployment notes:
+      # leaving WEBHOOK_PROXY_URL unset is what disables the local-only smee
+      # tunnel in code, and Render injects its own PORT.

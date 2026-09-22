@@ -1,10 +1,10 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { checkoutAt, listTrackedFiles, REPOS_DIR } from "./clone.js";
+import { checkoutAt, listTrackedFiles, removeRepoCheckout, REPOS_DIR } from "./clone.js";
 import { languageForFile, parseSource } from "./parse.js";
 import { extractSymbols } from "./symbols.js";
 import { extractCallEdges } from "./callGraph.js";
-import { readIndexCache, writeIndexCache } from "./cache.js";
+import { readIndexCache, writeIndexCache, deleteIndexCache } from "./cache.js";
 import type { CodeSymbol, RepoIndex } from "./types.js";
 
 const EXCLUDED_PATH = /(^|\/)(node_modules|vendor|dist|build|\.git|__pycache__)\//;
@@ -61,3 +61,18 @@ export async function ensureIndex(owner: string, name: string, sha: string): Pro
 }
 
 export { REPOS_DIR };
+
+/**
+ * Deletes both the git checkout and the cached index JSON for (owner, name,
+ * sha) - a real PR's headSha is essentially never reviewed twice, so
+ * nothing is lost by not keeping them around, and on a memory/disk
+ * constrained host (e.g. Render's free tier) leaving them indefinitely
+ * would grow unbounded across every repo ever reviewed. apps/worker calls
+ * this after every repo-aware review, success or failure. Not used by
+ * evals/runner, which deliberately relies on this same cache persisting
+ * across repeated runs against its small, fixed dataset.
+ */
+export function cleanupIndex(owner: string, name: string, sha: string): void {
+  removeRepoCheckout(owner, name);
+  deleteIndexCache(owner, name, sha);
+}

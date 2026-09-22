@@ -13,7 +13,7 @@ import {
   type PrFile,
   type ReviewOutcome,
 } from "@prlens/reviewer";
-import { ensureIndex, retrieveContext, type RetrievedContext, type RetrievedItem } from "@prlens/indexer";
+import { ensureIndex, cleanupIndex, retrieveContext, type RetrievedContext, type RetrievedItem } from "@prlens/indexer";
 import { getInstallationOctokit } from "./github.js";
 import { recordReview } from "./db.js";
 import { supersedePreviousReview } from "./supersede.js";
@@ -76,10 +76,19 @@ export async function processReviewJob(job: Job<ReviewJobData>): Promise<void> {
     // repo). Head sha is a strict superset of base for this purpose - every
     // pre-existing caller/callee this was designed to find is still present
     // post-PR unless the PR itself deletes it.
-    const index = await ensureIndex(data.owner, data.repo, data.headSha);
-    const hunks = extractHunks(included);
-    retrievedContexts = hunks.map((hunk) => retrieveContext(index, hunk, CONTEXT_TOKENS_PER_HUNK));
-    outcome = await runRepoAwareReview(included, skipped, retrievedContexts);
+    // Cleaned up in `finally`, not left on disk: a memory/disk-constrained
+    // production host (e.g. Render's free tier, 512MB) can't accumulate one
+    // repo checkout + parsed index per review indefinitely, and a real PR's
+    // headSha is essentially never reviewed twice, so nothing reusable is
+    // lost by deleting it right after this review uses it.
+    try {
+      const index = await ensureIndex(data.owner, data.repo, data.headSha);
+      const hunks = extractHunks(included);
+      retrievedContexts = hunks.map((hunk) => retrieveContext(index, hunk, CONTEXT_TOKENS_PER_HUNK));
+      outcome = await runRepoAwareReview(included, skipped, retrievedContexts);
+    } finally {
+      cleanupIndex(data.owner, data.repo, data.headSha);
+    }
   } else {
     outcome = await runDiffOnlyReview(included, skipped);
   }
