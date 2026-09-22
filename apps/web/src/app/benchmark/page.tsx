@@ -149,20 +149,31 @@ export default function BenchmarkPage() {
                 {METRICS.map((m) => {
                   const { a, b, aPct, bPct } = m.fmt(report.overall.diffOnly, report.overall.repoAware);
                   const { text: deltaText, good } = m.delta(report.overall.diffOnly, report.overall.repoAware);
+                  const isRepeatedRecall = m.key === "recall" && report.repeated;
                   return (
                     <div key={m.key} className="grid grid-cols-[minmax(0,1.3fr)_repeat(2,minmax(0,1fr))_minmax(0,0.8fr)] items-center border-b border-border-row px-7 py-[22px]">
                       <div className="flex flex-col gap-1">
                         <span className="text-[16px] font-medium text-text-strong">{m.name}</span>
-                        <span className="text-[12px] text-text-dim">{m.hint}</span>
+                        <span className="text-[12px] text-text-dim">{isRepeatedRecall ? `mean of ${report.repeated!.runsPerPair} runs · higher is better` : m.hint}</span>
                       </div>
                       <div className="flex flex-col gap-2 pr-8">
                         <span className="font-mono text-[30px] font-medium tracking-[-0.02em] text-text-secondary">{a}</span>
+                        {isRepeatedRecall && (
+                          <span className="text-[11px] text-text-dim">
+                            range {fmtPct(report.repeated!.diffOnly.recallMin)}–{fmtPct(report.repeated!.diffOnly.recallMax)}
+                          </span>
+                        )}
                         <div className="h-1 rounded-sm bg-surface-header">
                           <div className="h-1 rounded-sm bg-mode-diff-only" style={{ width: `${aPct}%` }} />
                         </div>
                       </div>
                       <div className="flex flex-col gap-2 pr-8">
                         <span className="font-mono text-[30px] font-medium tracking-[-0.02em] text-text-brightest">{b}</span>
+                        {isRepeatedRecall && (
+                          <span className="text-[11px] text-text-dim">
+                            range {fmtPct(report.repeated!.repoAware.recallMin)}–{fmtPct(report.repeated!.repoAware.recallMax)}
+                          </span>
+                        )}
                         <div className="h-1 rounded-sm bg-surface-header">
                           <div className="h-1 rounded-sm bg-accent" style={{ width: `${bPct}%` }} />
                         </div>
@@ -181,12 +192,36 @@ export default function BenchmarkPage() {
                     <circle cx="12" cy="12" r="9" />
                     <path d="M12 8v5M12 16.5v.5" />
                   </svg>
-                  Small sample: with {report.overall.diffOnly.pairCount} pairs, one bug moves recall by {(100 / report.overall.diffOnly.pairCount).toFixed(1)} points. Treat differences under ~25 points as noise until more pairs land.
+                  {report.repeated ? (
+                    report.repeated.rangesOverlap ? (
+                      <>
+                        Repeated runs ({report.repeated.runsPerPair}× per pair per mode): diff-only's recall range and repo-aware's overlap. At n={report.overall.diffOnly.pairCount}, the two modes are <strong>not distinguishable</strong> on this
+                        sample - the mean difference above is within run-to-run model noise, not a real effect.
+                      </>
+                    ) : (
+                      <>
+                        Repeated runs ({report.repeated.runsPerPair}× per pair per mode): the recall ranges don&apos;t overlap - the difference above holds up across independent runs, not just one lucky (or unlucky) sample.
+                      </>
+                    )
+                  ) : (
+                    <>
+                      Small sample: with {report.overall.diffOnly.pairCount} pairs, one bug moves recall by {(100 / report.overall.diffOnly.pairCount).toFixed(1)} points. Treat differences under ~25 points as noise until more pairs land.
+                    </>
+                  )}
                 </div>
               </div>
             </section>
 
             <ConfusionAndPairs report={report} />
+
+            {report.repeated?.retrievalQuietModelNote && (
+              <section aria-labelledby="h-quiet" className="flex max-w-[760px] flex-col gap-2 rounded-[12px] border border-border bg-surface-sunken p-5">
+                <h2 id="h-quiet" className="m-0 text-[13px] font-medium uppercase tracking-[0.08em] text-text-faint">
+                  Retrieval worked, the model didn&apos;t act on it
+                </h2>
+                <p className="m-0 text-[13px] leading-relaxed text-text-muted">{report.repeated.retrievalQuietModelNote}</p>
+              </section>
+            )}
 
             <section id="method" aria-labelledby="h-method" className="flex flex-col gap-4">
               <h2 id="h-method" className="m-0 text-[13px] font-medium uppercase tracking-[0.08em] text-text-faint">
@@ -223,14 +258,21 @@ export default function BenchmarkPage() {
 }
 
 function ConfusionAndPairs({ report }: { report: NonNullable<ReturnType<typeof loadLatestComparisonReport>> }) {
-  const matrix = confusionMatrix(report.pairs);
+  const repeated = report.repeated;
+  const matrix = repeated
+    ? { both: repeated.confusionMatrix.both, diffOnly: repeated.confusionMatrix.diffOnly, repoAwareOnly: repeated.confusionMatrix.repoAwareOnly, neither: repeated.confusionMatrix.neither }
+    : confusionMatrix(report.pairs);
+  const matrixUnit = repeated ? "run" : "pair";
+  const matrixTotal = repeated ? repeated.confusionMatrix.totalComparisons : report.pairs.length;
   return (
     <section aria-labelledby="h-pairs" className="flex flex-col gap-4">
       <div className="flex items-baseline justify-between">
         <h2 id="h-pairs" className="m-0 text-[13px] font-medium uppercase tracking-[0.08em] text-text-faint">
           Which mode caught which bug
         </h2>
-        <span className="text-[12px] text-text-dim">caught = a finding within 5 lines of the bug that names the defect</span>
+        <span className="text-[12px] text-text-dim">
+          caught = a finding within 5 lines of the bug that names the defect{repeated ? ` · matrix counts all ${matrixTotal} pair×run comparisons, not pairs` : ""}
+        </span>
       </div>
       <div className="grid grid-cols-[320px_minmax(0,1fr)] items-start gap-5">
         <div className="flex flex-col gap-3.5 rounded-[12px] border border-border bg-surface-sunken p-5">
@@ -259,10 +301,11 @@ function ConfusionAndPairs({ report }: { report: NonNullable<ReturnType<typeof l
           </div>
           <p className="m-0 text-[13px] leading-relaxed text-text-muted">
             {matrix.repoAwareOnly > 0
-              ? `${matrix.repoAwareOnly} bug${matrix.repoAwareOnly === 1 ? "" : "s"} only repo-aware caught. `
+              ? `${matrix.repoAwareOnly} ${matrixUnit}${matrix.repoAwareOnly === 1 ? "" : "s"} only repo-aware caught. `
               : ""}
-            {matrix.diffOnly > 0 ? `${matrix.diffOnly} bug${matrix.diffOnly === 1 ? "" : "s"} only diff-only caught. ` : ""}
-            {matrix.neither} pair{matrix.neither === 1 ? "" : "s"} caught by neither mode.
+            {matrix.diffOnly > 0 ? `${matrix.diffOnly} ${matrixUnit}${matrix.diffOnly === 1 ? "" : "s"} only diff-only caught. ` : ""}
+            {matrix.neither} {matrixUnit}
+            {matrix.neither === 1 ? "" : "s"} caught by neither mode.
           </p>
         </div>
 
@@ -284,16 +327,24 @@ function ConfusionAndPairs({ report }: { report: NonNullable<ReturnType<typeof l
                 {p.method} · {p.confidence}
               </span>
               <span className="flex justify-center">
-                <CaughtBadge caught={p.diffOnlyCaught} color="var(--color-mode-diff-only)" fg="#0b0d10" />
+                {p.diffOnlyCatchCount !== undefined && p.diffOnlyRuns !== undefined ? (
+                  <CatchRateBadge count={p.diffOnlyCatchCount} total={p.diffOnlyRuns} color="var(--color-mode-diff-only)" fg="#0b0d10" />
+                ) : (
+                  <CaughtBadge caught={p.diffOnlyCaught} color="var(--color-mode-diff-only)" fg="#0b0d10" />
+                )}
               </span>
               <span className="flex justify-center">
-                <CaughtBadge caught={p.repoAwareCaught} color="var(--color-accent)" fg="#062117" />
+                {p.repoAwareCatchCount !== undefined && p.repoAwareRuns !== undefined ? (
+                  <CatchRateBadge count={p.repoAwareCatchCount} total={p.repoAwareRuns} color="var(--color-accent)" fg="#062117" />
+                ) : (
+                  <CaughtBadge caught={p.repoAwareCaught} color="var(--color-accent)" fg="#062117" />
+                )}
               </span>
             </div>
           ))}
           <div className="grid grid-cols-[36px_minmax(0,1fr)_100px_84px_84px] items-center gap-3 bg-surface-deep px-5 py-3.5 font-mono text-[12px] text-text-faint">
             <span />
-            <span>total caught</span>
+            <span>total caught{repeated ? " (majority of runs)" : ""}</span>
             <span />
             <span className="text-center text-text-secondary">
               {report.pairs.filter((p) => p.diffOnlyCaught).length} / {report.pairs.length}
@@ -315,6 +366,25 @@ function CaughtBadge({ caught, color, fg }: { caught: boolean; color: string; fg
     </span>
   ) : (
     <span className="rounded-[4px] border border-border-dashed px-2 py-0.5 font-mono text-[11px] text-text-dimmer">missed</span>
+  );
+}
+
+/** "X/N" for a repeated-run report - a solid badge at N/N, a dashed empty badge at 0/N, and a muted fractional badge in between (caught sometimes, not reliably). */
+function CatchRateBadge({ count, total, color, fg }: { count: number; total: number; color: string; fg: string }) {
+  if (count === 0) {
+    return <span className="rounded-[4px] border border-border-dashed px-2 py-0.5 font-mono text-[11px] text-text-dimmer">0/{total}</span>;
+  }
+  if (count === total) {
+    return (
+      <span className="rounded-[4px] px-2 py-0.5 font-mono text-[11px]" style={{ color: fg, background: color }}>
+        {count}/{total}
+      </span>
+    );
+  }
+  return (
+    <span className="rounded-[4px] border px-2 py-0.5 font-mono text-[11px]" style={{ borderColor: color, color }}>
+      {count}/{total}
+    </span>
   );
 }
 
