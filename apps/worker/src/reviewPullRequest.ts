@@ -93,7 +93,13 @@ export async function processReviewJob(job: Job<ReviewJobData>): Promise<void> {
     outcome = await runDiffOnlyReview(included, skipped);
   }
 
-  const { body, inlineComments } = formatReview(outcome.findings, diffLineMap, skipped, outcome.failed);
+  const { body, inlineComments } = formatReview(
+    outcome.findings,
+    diffLineMap,
+    skipped,
+    outcome.failed,
+    mode === ReviewMode.REPO_AWARE ? "repo-aware" : "diff-only",
+  );
 
   // Mark the PR's previous PRLens review (if any) as superseded and drop its
   // now-stale inline comments, before posting this one - so reviews don't

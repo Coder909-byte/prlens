@@ -44,6 +44,7 @@ export function formatReview(
   diffLineMap: Map<string, Set<number>>,
   skipped: SkippedFile[],
   failed: boolean,
+  mode: "diff-only" | "repo-aware",
 ): FormattedReview {
   const inlineComments: InlineComment[] = [];
   const outOfDiffFindings: Finding[] = [];
@@ -62,7 +63,7 @@ export function formatReview(
     }
   }
 
-  const bodyParts: string[] = ["## PRLens diff-only review"];
+  const bodyParts: string[] = [mode === "repo-aware" ? "## PRLens repo-aware review" : "## PRLens diff-only review"];
 
   if (failed) {
     bodyParts.push("⚠️ The review model did not return a valid response for this PR. No findings were generated.");
