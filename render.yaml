@@ -7,6 +7,16 @@ services:
     # No rootDir - stays at the repo root, same reasoning as any pnpm
     # workspace: pnpm needs the root lockfile to resolve installs, and every
     # command below targets one workspace package explicitly via --filter.
+    #
+    # `corepack pnpm ...`, not `corepack enable && pnpm ...`: Render's image
+    # preinstalls pnpm at /usr/bin/pnpm on a read-only filesystem, so `corepack
+    # enable` (which writes shims into the same directory) fails with EROFS.
+    # `corepack pnpm` is corepack's direct pass-through invocation - it reads
+    # the pinned version from the root package.json's `packageManager` field
+    # (pnpm@11.10.0, matching the committed lockfile) and runs it from
+    # corepack's own managed cache, never touching /usr/bin. Verified locally
+    # that `corepack pnpm --version` resolves the pinned version this way.
+    #
     # NODE_ENV=development for install only: pnpm (like npm) silently skips
     # devDependencies when NODE_ENV=production is set, and tsx/typescript
     # here are devDependencies needed to actually RUN the app (this repo has
@@ -14,12 +24,15 @@ services:
     # prod same as local dev). Render sets NODE_ENV=production for the
     # running service; whether that also applies during the build step isn't
     # documented, so this doesn't rely on it either way.
-    # `migrate deploy` applies any pending migrations against DIRECT_URL (a
-    # no-op today - the Neon DB this points at is already up to date - but
-    # without it, a future schema change would need someone to remember to
-    # run it by hand before/after every deploy).
-    buildCommand: corepack enable && NODE_ENV=development pnpm install --frozen-lockfile && pnpm --filter @prlens/db exec prisma generate && pnpm --filter @prlens/db exec prisma migrate deploy
-    startCommand: pnpm --filter @prlens/server run start
+    #
+    # `migrate deploy` applies any pending migrations against DIRECT_URL, not
+    # the pooled DATABASE_URL - verified locally (migrate status succeeds
+    # with DATABASE_URL pointed at a nonexistent host, as long as DIRECT_URL
+    # is valid). A no-op today - the Neon DB this points at is already up to
+    # date - but without it, a future schema change would need someone to
+    # remember to run it by hand before/after every deploy.
+    buildCommand: NODE_ENV=development corepack pnpm install --frozen-lockfile && corepack pnpm --filter @prlens/db exec prisma generate && corepack pnpm --filter @prlens/db exec prisma migrate deploy
+    startCommand: corepack pnpm --filter @prlens/server run start
     healthCheckPath: /health
     envVars:
       - key: NODE_VERSION
