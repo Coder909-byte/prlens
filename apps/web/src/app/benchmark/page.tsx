@@ -1,7 +1,13 @@
 import { loadLatestComparisonReport, type AggregateStats, type ComparisonPairRow } from "@/lib/benchmark-report";
 import { formatCost, formatLatency } from "@/lib/format";
 
-// Reads the newest committed report off disk at request time, not baked into the build.
+// force-dynamic keeps this from being statically prerendered at build time
+// with whatever reports happen to exist right then. It's still not truly
+// "live" in production, though: on Vercel, evals/reports/*.json is bundled
+// into the deployed function via outputFileTracingIncludes (next.config.ts)
+// - the newest committed report at BUILD time, not the newest one on disk
+// at request time. A newly committed report only appears here after the
+// next Vercel deploy, not on the next page load.
 export const dynamic = "force-dynamic";
 
 function fmtPct(n: number): string {
